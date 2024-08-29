@@ -1,4 +1,4 @@
-package com.example.riverside.ui.screens.feeds
+package com.example.riverside.ui.screens.feeds.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class FeedsViewModel @Inject constructor(
+class FeedListViewModel @Inject constructor(
     feedRepository: FeedRepository,
 ) : ViewModel() {
     val allFeeds: StateFlow<List<Feed>> = feedRepository.findAll()

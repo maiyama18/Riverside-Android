@@ -15,6 +15,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.riverside.ui.navigation.RootRoute
 
 @Composable
 fun RootBottomBar(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -23,9 +24,9 @@ fun RootBottomBar(navController: NavHostController, modifier: Modifier = Modifie
 
     BottomAppBar(modifier = modifier) {
         NavigationBarItem(
-            selected = currentDestination?.hierarchy?.any { it.hasRoute(Stream::class) } == true,
+            selected = currentDestination?.hierarchy?.any { it.hasRoute(RootRoute.Stream::class) } == true,
             onClick = {
-                navController.navigate(Stream) {
+                navController.navigate(RootRoute.Stream) {
                     popUpTo(navController.graph.startDestinationId)
                     launchSingleTop = true
                 }
@@ -39,9 +40,9 @@ fun RootBottomBar(navController: NavHostController, modifier: Modifier = Modifie
             label = { Text("Stream") }
         )
         NavigationBarItem(
-            selected = currentDestination?.hierarchy?.any { it.hasRoute(Feeds::class) } == true,
+            selected = currentDestination?.hierarchy?.any { it.hasRoute(RootRoute.Feeds::class) } == true,
             onClick = {
-                navController.navigate(Feeds) {
+                navController.navigate(RootRoute.Feeds) {
                     popUpTo(navController.graph.startDestinationId)
                     launchSingleTop = true
                 }
@@ -55,9 +56,9 @@ fun RootBottomBar(navController: NavHostController, modifier: Modifier = Modifie
             label = { Text("Feeds") }
         )
         NavigationBarItem(
-            selected = currentDestination?.hierarchy?.any { it.hasRoute(Settings::class) } == true,
+            selected = currentDestination?.hierarchy?.any { it.hasRoute(RootRoute.Settings::class) } == true,
             onClick = {
-                navController.navigate(Settings) {
+                navController.navigate(RootRoute.Settings) {
                     popUpTo(navController.graph.startDestinationId)
                     launchSingleTop = true
                 }

@@ -1,4 +1,4 @@
-package com.example.riverside.ui.screens.feeds
+package com.example.riverside.ui.screens.feeds.list
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,12 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.example.riverside.ui.components.ContentUnavailableAction
 import com.example.riverside.ui.components.ContentUnavailableView
+import com.example.riverside.ui.navigation.FeedsRoute
 
 @Composable
-fun FeedsScreen(
-    viewModel: FeedsViewModel = hiltViewModel(),
+fun FeedListScreen(
+    navController: NavHostController,
+    viewModel: FeedListViewModel = hiltViewModel(),
 ) {
     val feeds by viewModel.allFeeds.collectAsStateWithLifecycle()
     if (feeds.isEmpty()) {
@@ -24,7 +27,7 @@ fun FeedsScreen(
             subtitle = "Follow your favorite feeds to see them here",
             action = ContentUnavailableAction(
                 title = "Subscribe feed",
-                action = {},
+                action = { navController.navigate(FeedsRoute.FeedSubscription) },
             ),
         )
     } else {
