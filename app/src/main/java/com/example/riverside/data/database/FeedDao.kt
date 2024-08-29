@@ -14,7 +14,7 @@ interface FeedDao {
     suspend fun insert(feed: Feed)
 
     @Query("SELECT * FROM feeds")
-    suspend fun findAll(): Flow<List<Feed>>
+    fun findAll(): Flow<List<Feed>>
 
     @Update
     suspend fun update(feed: Feed)

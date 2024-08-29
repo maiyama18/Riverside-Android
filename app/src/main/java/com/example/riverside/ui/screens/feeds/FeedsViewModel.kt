@@ -1,10 +1,19 @@
 package com.example.riverside.ui.screens.feeds
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.riverside.data.database.Feed
+import com.example.riverside.data.repositories.FeedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class FeedsViewModel @Inject constructor() : ViewModel() {
-    val title = "Feeds"
+class FeedsViewModel @Inject constructor(
+    feedRepository: FeedRepository,
+) : ViewModel() {
+    val allFeeds: StateFlow<List<Feed>> = feedRepository.findAll()
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 }

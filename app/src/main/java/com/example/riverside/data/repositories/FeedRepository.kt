@@ -9,5 +9,5 @@ class FeedRepository @Inject constructor(
     private val feedDao: FeedDao,
 ) {
     suspend fun subscribe(feed: Feed) = feedDao.insert(feed)
-    suspend fun findAll(): Flow<List<Feed>> = feedDao.findAll()
+    fun findAll(): Flow<List<Feed>> = feedDao.findAll()
 }
