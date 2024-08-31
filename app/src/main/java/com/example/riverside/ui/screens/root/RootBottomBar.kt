@@ -11,16 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.riverside.ui.navigation.FeedList
 import com.example.riverside.ui.navigation.Settings
 import com.example.riverside.ui.navigation.Stream
-
-fun NavDestination.hasRoute(route: Any): Boolean = hierarchy.any { it.hasRoute(route::class) }
 
 @Composable
 fun RootBottomBar(navController: NavHostController, modifier: Modifier = Modifier) {

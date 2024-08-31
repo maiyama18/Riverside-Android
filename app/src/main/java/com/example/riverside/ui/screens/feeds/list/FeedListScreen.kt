@@ -13,6 +13,12 @@ import androidx.navigation.NavHostController
 import com.example.riverside.ui.components.ContentUnavailableAction
 import com.example.riverside.ui.components.ContentUnavailableView
 import com.example.riverside.ui.navigation.FeedSubscription
+import com.example.riverside.ui.screens.root.RiversideTopBar
+
+@Composable
+fun FeedListTopBar() {
+    RiversideTopBar(title = "Feeds")
+}
 
 @Composable
 fun FeedListScreen(
