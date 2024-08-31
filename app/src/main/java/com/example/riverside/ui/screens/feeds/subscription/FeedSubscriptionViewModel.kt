@@ -1,5 +1,6 @@
 package com.example.riverside.ui.screens.feeds.subscription
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.riverside.data.network.FeedResponse
@@ -37,8 +38,8 @@ class FeedSubscriptionViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             urlInput
-                .debounce(300)
-                .filter { it.isNotBlank() }
+                .debounce(500)
+                .filter { Patterns.WEB_URL.matcher(it).matches() }
                 .distinctUntilChanged()
                 .collect { fetchFeed(it) }
         }
