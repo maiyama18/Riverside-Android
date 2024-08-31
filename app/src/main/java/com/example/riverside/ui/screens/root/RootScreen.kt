@@ -13,7 +13,9 @@ fun RootScreen(modifier: Modifier = Modifier) {
 
     Scaffold(
         modifier = modifier,
-        bottomBar = { RootBottomBar(navController = navController) }
+        bottomBar = {
+            RootBottomBar(navController = navController)
+        }
     ) { innerPadding ->
         RootNavHost(navController = navController, modifier = Modifier.padding(innerPadding))
     }

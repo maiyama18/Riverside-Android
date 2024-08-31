@@ -5,42 +5,46 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.example.riverside.ui.screens.feeds.list.FeedListScreen
+import com.example.riverside.ui.screens.feeds.subscription.FeedSubscriptionScreen
 import com.example.riverside.ui.screens.settings.SettingsScreen
 import com.example.riverside.ui.screens.stream.StreamScreen
 import kotlinx.serialization.Serializable
 
-object RootRoute {
-    @Serializable
-    object Stream
+@Serializable
+object Stream
 
-    @Serializable
-    object Feeds
+@Serializable
+object FeedList
 
-    @Serializable
-    object Settings
-}
+@Serializable
+object Settings
+
+@Serializable
+object FeedSubscription
 
 @Composable
 fun RootNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    val feedsNavHostController = rememberNavController()
-
     NavHost(
         navController = navController,
-        startDestination = RootRoute.Stream,
+        startDestination = Stream,
         modifier = modifier
     ) {
-        composable<RootRoute.Stream> {
+        composable<Stream> {
             StreamScreen()
         }
-        composable<RootRoute.Feeds> {
-            FeedsNavHost(navController = feedsNavHostController)
+        composable<FeedList> {
+            FeedListScreen(navController = navController)
         }
-        composable<RootRoute.Settings> {
+        composable<Settings> {
             SettingsScreen()
+        }
+
+        composable<FeedSubscription> {
+            FeedSubscriptionScreen()
         }
     }
 }

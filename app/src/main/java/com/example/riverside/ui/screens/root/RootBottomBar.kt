@@ -11,65 +11,76 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.riverside.ui.navigation.RootRoute
+import com.example.riverside.ui.navigation.FeedList
+import com.example.riverside.ui.navigation.Settings
+import com.example.riverside.ui.navigation.Stream
+
+fun NavDestination.hasRoute(route: Any): Boolean = hierarchy.any { it.hasRoute(route::class) }
 
 @Composable
 fun RootBottomBar(navController: NavHostController, modifier: Modifier = Modifier) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
 
-    BottomAppBar(modifier = modifier) {
-        NavigationBarItem(
-            selected = currentDestination?.hierarchy?.any { it.hasRoute(RootRoute.Stream::class) } == true,
-            onClick = {
-                navController.navigate(RootRoute.Stream) {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.RssFeed,
-                    contentDescription = "navigate to stream tab"
-                )
-            },
-            label = { Text("Stream") }
-        )
-        NavigationBarItem(
-            selected = currentDestination?.hierarchy?.any { it.hasRoute(RootRoute.Feeds::class) } == true,
-            onClick = {
-                navController.navigate(RootRoute.Feeds) {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.List,
-                    contentDescription = "navigate to feeds tab"
-                )
-            },
-            label = { Text("Feeds") }
-        )
-        NavigationBarItem(
-            selected = currentDestination?.hierarchy?.any { it.hasRoute(RootRoute.Settings::class) } == true,
-            onClick = {
-                navController.navigate(RootRoute.Settings) {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "navigate to settings tab"
-                )
-            },
-            label = { Text("Settings") }
-        )
+    val showsBottomBar = currentDestination?.hasRoute(Stream) == true ||
+            currentDestination?.hasRoute(FeedList) == true ||
+            currentDestination?.hasRoute(Settings) == true
+
+    if (showsBottomBar) {
+        BottomAppBar(modifier = modifier) {
+            NavigationBarItem(
+                selected = currentDestination?.hasRoute(Stream) == true,
+                onClick = {
+                    navController.navigate(Stream) {
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.RssFeed,
+                        contentDescription = "navigate to stream tab"
+                    )
+                },
+                label = { Text("Stream") }
+            )
+            NavigationBarItem(
+                selected = currentDestination?.hasRoute(FeedList) == true,
+                onClick = {
+                    navController.navigate(FeedList) {
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.List,
+                        contentDescription = "navigate to feeds tab"
+                    )
+                },
+                label = { Text("Feeds") }
+            )
+            NavigationBarItem(
+                selected = currentDestination?.hasRoute(Settings) == true,
+                onClick = {
+                    navController.navigate(Settings) {
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "navigate to settings tab"
+                    )
+                },
+                label = { Text("Settings") }
+            )
+        }
     }
 }

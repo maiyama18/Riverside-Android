@@ -12,7 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.riverside.ui.components.ContentUnavailableAction
 import com.example.riverside.ui.components.ContentUnavailableView
-import com.example.riverside.ui.navigation.FeedsRoute
+import com.example.riverside.ui.navigation.FeedSubscription
 
 @Composable
 fun FeedListScreen(
@@ -27,7 +27,7 @@ fun FeedListScreen(
             subtitle = "Follow your favorite feeds to see them here",
             action = ContentUnavailableAction(
                 title = "Subscribe feed",
-                action = { navController.navigate(FeedsRoute.FeedSubscription) },
+                action = { navController.navigate(FeedSubscription) },
             ),
         )
     } else {
