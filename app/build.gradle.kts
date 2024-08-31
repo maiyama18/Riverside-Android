@@ -68,6 +68,11 @@ dependencies {
     implementation(libs.kotlin.serialization.json)
     implementation(libs.google.dagger.hilt.android)
     implementation(libs.google.dagger.hilt.compiler)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.serialization.json)
 
     ksp(libs.google.dagger.hilt.compiler)
     ksp(libs.google.dagger.hilt.android.compiler)
