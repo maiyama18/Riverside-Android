@@ -73,6 +73,8 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.serialization.json)
+    implementation(libs.coil)
+    implementation(libs.coil.compose)
 
     ksp(libs.google.dagger.hilt.compiler)
     ksp(libs.google.dagger.hilt.android.compiler)
