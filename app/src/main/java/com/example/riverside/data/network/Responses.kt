@@ -1,5 +1,6 @@
 package com.example.riverside.data.network
 
+import com.example.riverside.data.database.Feed
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -10,7 +11,15 @@ data class FeedResponse(
     @SerialName("pageURL") val pageUrl: String? = null,
     @SerialName("imageURL") val imageUrl: String? = null,
     val overview: String? = null,
-)
+) {
+    fun toEntity(): Feed = Feed(
+        url = url,
+        title = title,
+        pageUrl = pageUrl,
+        imageUrl = imageUrl,
+        overview = overview,
+    )
+}
 
 @Serializable
 data class FeedResultResponse(

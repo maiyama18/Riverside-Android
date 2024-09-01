@@ -14,6 +14,6 @@ import javax.inject.Inject
 class FeedListViewModel @Inject constructor(
     feedRepository: FeedRepository,
 ) : ViewModel() {
-    val allFeeds: StateFlow<List<Feed>> = feedRepository.findAll()
+    val allFeeds: StateFlow<List<Feed>> = feedRepository.subscribedFeeds()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 }

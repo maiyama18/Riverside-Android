@@ -10,7 +10,7 @@ class FeedRepository @Inject constructor(
     private val feedDao: FeedDao,
     private val feedFetcher: FeedFetcher,
 ) {
-    fun findAll(): Flow<List<Feed>> = feedDao.findAll()
+    fun subscribedFeeds(): Flow<List<Feed>> = feedDao.findAll()
     suspend fun subscribe(feed: Feed) = feedDao.insert(feed)
 
     suspend fun fetch(url: String) = feedFetcher.fetchFeed(url, true)

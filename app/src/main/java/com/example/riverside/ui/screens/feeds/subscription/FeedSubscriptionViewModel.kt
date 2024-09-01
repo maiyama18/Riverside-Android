@@ -8,8 +8,10 @@ import com.example.riverside.data.repositories.FeedRepository
 import com.example.riverside.ui.controllers.SnackbarController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -37,6 +39,16 @@ class FeedSubscriptionViewModel @Inject constructor(
         MutableStateFlow<FeedSubscriptionScreenState>(FeedSubscriptionScreenState.Idle)
     val state: StateFlow<FeedSubscriptionScreenState> = _state
 
+    private val subscribedFeeds = feedRepository.subscribedFeeds()
+    val currentFeedSubscribed: Flow<Boolean> =
+        subscribedFeeds.combine(state) { subscribedFeeds, state ->
+            if (state is FeedSubscriptionScreenState.Success) {
+                subscribedFeeds.any { it.url == state.feed.url }
+            } else {
+                false
+            }
+        }
+
     init {
         viewModelScope.launch {
             urlInput
@@ -52,7 +64,15 @@ class FeedSubscriptionViewModel @Inject constructor(
     }
 
     fun onFeedSubscribe(feed: FeedResponse) {
-        snackbarController.present("Subscribed to ${feed.title}")
+        viewModelScope.launch {
+            try {
+                feedRepository.subscribe(feed.toEntity())
+                snackbarController.present("Subscribed to ${feed.title}")
+                _urlInput.value = ""
+            } catch (e: Exception) {
+                snackbarController.present("Failed to subscribe to ${feed.title}: ${e.message}")
+            }
+        }
     }
 
     private suspend fun fetchFeed(url: String) {

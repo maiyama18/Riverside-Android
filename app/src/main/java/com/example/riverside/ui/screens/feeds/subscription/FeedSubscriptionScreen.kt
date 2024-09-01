@@ -28,6 +28,9 @@ fun FeedSubscriptionScreen(
 ) {
     val urlInput by viewModel.urlInput.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val currentFeedSubscribed by viewModel.currentFeedSubscribed.collectAsStateWithLifecycle(
+        initialValue = false
+    )
 
     Column(
         modifier = modifier
@@ -54,7 +57,7 @@ fun FeedSubscriptionScreen(
             is FeedSubscriptionScreenState.Success -> {
                 FeedSummaryView(
                     feed = currentState.feed,
-                    feedAlreadySubscribed = false, // FIXME
+                    feedAlreadySubscribed = currentFeedSubscribed,
                     onSubscribeClick = { viewModel.onFeedSubscribe(currentState.feed) },
                 )
             }
