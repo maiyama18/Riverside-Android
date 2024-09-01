@@ -17,13 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.riverside.data.network.FeedResponse
+import com.example.riverside.data.models.Feed
 import com.example.riverside.ui.components.FeedImage
 import io.ktor.http.Url
 
 @Composable
 fun FeedSummaryView(
-    feed: FeedResponse,
+    feed: Feed,
     feedAlreadySubscribed: Boolean,
     onSubscribeClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -90,7 +90,7 @@ fun FeedSummaryView(
 fun FeedSummaryViewPreview() {
     Box(modifier = Modifier.padding(8.dp)) {
         FeedSummaryView(
-            feed = FeedResponse(
+            feed = Feed(
                 url = "https://maiyama4.hatenablog.com/feed",
                 title = "maiyama4's blog",
                 pageUrl = "https://maiyama4.hatenablog.com",

@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.example.riverside.data.database.FeedEntity
+import com.example.riverside.data.models.Feed
 import com.example.riverside.ui.components.ContentUnavailableAction
 import com.example.riverside.ui.components.ContentUnavailableView
 import com.example.riverside.ui.components.FeedImage
@@ -66,7 +66,7 @@ fun FeedListScreen(
     } else {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             itemsIndexed(feeds) { index, feed ->
-                FeedListItem(feedEntity = feed)
+                FeedListItem(feed = feed)
                 if (index < feeds.lastIndex) {
                     Divider()
                 }
@@ -76,7 +76,7 @@ fun FeedListScreen(
 }
 
 @Composable
-fun FeedListItem(feedEntity: FeedEntity) {
+fun FeedListItem(feed: Feed) {
     Row(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -84,15 +84,15 @@ fun FeedListItem(feedEntity: FeedEntity) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        FeedImage(imageUrl = feedEntity.imageUrl, size = 48.dp)
+        FeedImage(imageUrl = feed.imageUrl, size = 48.dp)
 
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.Start,
         ) {
-            Text(text = feedEntity.title, fontWeight = FontWeight.Bold)
+            Text(text = feed.title, fontWeight = FontWeight.Bold)
 
-            val host = Url(feedEntity.url).host
+            val host = Url(feed.url).host
             if (host.isNotEmpty()) {
                 Text(
                     host,

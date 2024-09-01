@@ -2,7 +2,7 @@ package com.example.riverside.ui.screens.feeds.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.riverside.data.database.FeedEntity
+import com.example.riverside.data.models.Feed
 import com.example.riverside.data.repositories.FeedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,6 +14,6 @@ import javax.inject.Inject
 class FeedListViewModel @Inject constructor(
     feedRepository: FeedRepository,
 ) : ViewModel() {
-    val allFeeds: StateFlow<List<FeedEntity>> = feedRepository.subscribedFeeds()
+    val allFeeds: StateFlow<List<Feed>> = feedRepository.subscribedFeeds()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 }

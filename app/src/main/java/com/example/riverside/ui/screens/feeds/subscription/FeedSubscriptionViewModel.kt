@@ -3,7 +3,7 @@ package com.example.riverside.ui.screens.feeds.subscription
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.riverside.data.network.FeedResponse
+import com.example.riverside.data.models.Feed
 import com.example.riverside.data.repositories.FeedRepository
 import com.example.riverside.ui.controllers.SnackbarController
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +21,7 @@ import javax.inject.Inject
 sealed class FeedSubscriptionScreenState {
     data object Idle : FeedSubscriptionScreenState()
     data object Loading : FeedSubscriptionScreenState()
-    data class Success(val feed: FeedResponse) : FeedSubscriptionScreenState()
+    data class Success(val feed: Feed) : FeedSubscriptionScreenState()
     data class Error(val message: String) : FeedSubscriptionScreenState()
 }
 
@@ -63,10 +63,10 @@ class FeedSubscriptionViewModel @Inject constructor(
         _urlInput.value = url
     }
 
-    fun onFeedSubscribe(feed: FeedResponse) {
+    fun onFeedSubscribe(feed: Feed) {
         viewModelScope.launch {
             try {
-                feedRepository.subscribe(feed.toEntity())
+                feedRepository.subscribe(feed)
                 snackbarController.present("Subscribed to ${feed.title}")
                 _urlInput.value = ""
                 _state.value = FeedSubscriptionScreenState.Idle
