@@ -39,21 +39,21 @@ fun RootNavHost(
         modifier = modifier
     ) {
         composable<Stream> {
-            StreamScreen()
+            StreamScreen(navController = navController)
         }
         composable<FeedList> {
             FeedListScreen(navController = navController)
         }
         composable<Settings> {
-            SettingsScreen()
+            SettingsScreen(navController = navController)
         }
 
         composable<FeedSubscription> {
-            FeedSubscriptionScreen()
+            FeedSubscriptionScreen(navController = navController)
         }
         composable<FeedDetail> { backStackEntry ->
             val route: FeedDetail = backStackEntry.toRoute()
-            FeedDetailScreen(feedUrl = route.feedUrl)
+            FeedDetailScreen(feedUrl = route.feedUrl, navController = navController)
         }
     }
 }

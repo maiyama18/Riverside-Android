@@ -6,11 +6,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import com.example.riverside.ui.components.WithTopBar
 
 @Composable
-fun StreamScreen() {
-    WithTopBar(title = "Stream") {
+fun StreamScreen(navController: NavHostController) {
+    WithTopBar(title = "Stream", navController = navController) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,

@@ -44,6 +44,7 @@ fun FeedListScreen(
 
     WithTopBar(
         title = "Feeds",
+        navController = navController,
         actions = listOf(
             TopBarAction(
                 icon = Icons.Default.AddCircle,
