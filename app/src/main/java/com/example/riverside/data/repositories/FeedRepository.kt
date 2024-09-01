@@ -1,5 +1,6 @@
 package com.example.riverside.data.repositories
 
+import com.example.riverside.data.database.EntryEntity
 import com.example.riverside.data.database.FeedDao
 import com.example.riverside.data.database.FeedEntity
 import com.example.riverside.data.models.Feed
@@ -13,11 +14,26 @@ class FeedRepository @Inject constructor(
     private val feedFetcher: FeedFetcher,
 ) {
     fun subscribedFeeds(): Flow<List<Feed>> =
-        feedDao.findAll().map { entities -> entities.map { it.toModel() } }
+        feedDao.findAll().map { entities ->
+            entities.map { (feedEntity, entryEntities) ->
+                feedEntity.toModel(entryEntities)
+            }
+        }
 
     suspend fun subscribe(feed: Feed) {
         val feedEntity = FeedEntity.fromModel(feed)
-        feedDao.insert(feedEntity)
+        val entryEntities = feed.entries
+            .map { EntryEntity.fromModel(feedEntity.url, it) }
+            .sortedByDescending { it.publishedAt }
+            .mapIndexed { index, entry ->
+                // Mark entries older than the first 3 as read.
+                entry.apply {
+                    if (index > 2) {
+                        read = true
+                    }
+                }
+            }
+        feedDao.insert(feedEntity, entryEntities)
     }
 
     suspend fun fetch(url: String): Feed {

@@ -17,8 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.riverside.data.models.Entry
 import com.example.riverside.data.models.Feed
 import com.example.riverside.ui.components.FeedImage
+import kotlinx.datetime.Instant
 
 @Composable
 fun FeedSummaryView(
@@ -65,6 +67,12 @@ fun FeedSummaryView(
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
+            Text(
+                "${feed.entries.size} entries",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+            )
 
             Button(
                 onClick = onSubscribeClick,
@@ -94,6 +102,22 @@ fun FeedSummaryViewPreview() {
                 pageUrl = "https://maiyama4.hatenablog.com",
                 imageUrl = "https://maiyama4.hatenablog.com/favicon",
                 overview = "This is a blog primarily focused on iOS development. It is updated approximately once a week.",
+                entries = listOf(
+                    Entry(
+                        url = "https://maiyama4.hatenablog.com/entry/2021/09/01/000000",
+                        title = "How to use SwiftUI's @StateObject",
+                        publishedAt = Instant.parse("2021-09-01T00:00:00Z"),
+                        content = "This article explains how to use SwiftUI's @StateObject property wrapper.",
+                        read = false,
+                    ),
+                    Entry(
+                        url = "https://maiyama4.hatenablog.com/entry/2021/08/25/000000",
+                        title = "Introduction to Swift Concurrency",
+                        publishedAt = Instant.parse("2021-08-25T00:00:00Z"),
+                        content = "This article introduces Swift Concurrency, a new feature in Swift 5.5.",
+                        read = false,
+                    ),
+                ),
             ),
             feedAlreadySubscribed = false,
             onSubscribeClick = {},

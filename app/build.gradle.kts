@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlin.datetime)
     implementation(libs.google.dagger.hilt.android)
     implementation(libs.google.dagger.hilt.compiler)
     implementation(libs.ktor.client.core)
