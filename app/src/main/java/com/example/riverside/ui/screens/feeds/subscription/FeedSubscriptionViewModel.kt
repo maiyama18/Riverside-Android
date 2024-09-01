@@ -69,6 +69,7 @@ class FeedSubscriptionViewModel @Inject constructor(
                 feedRepository.subscribe(feed.toEntity())
                 snackbarController.present("Subscribed to ${feed.title}")
                 _urlInput.value = ""
+                _state.value = FeedSubscriptionScreenState.Idle
             } catch (e: Exception) {
                 snackbarController.present("Failed to subscribe to ${feed.title}: ${e.message}")
             }
