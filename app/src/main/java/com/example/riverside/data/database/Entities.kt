@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "feeds")
-data class Feed(
+data class FeedEntity(
     @PrimaryKey(autoGenerate = false) val url: String,
     val title: String,
     val pageUrl: String?,

@@ -11,14 +11,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface FeedDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(feed: Feed)
+    suspend fun insert(feedEntity: FeedEntity)
 
     @Query("SELECT * FROM feeds")
-    fun findAll(): Flow<List<Feed>>
+    fun findAll(): Flow<List<FeedEntity>>
 
     @Update
-    suspend fun update(feed: Feed)
+    suspend fun update(feedEntity: FeedEntity)
 
     @Delete
-    suspend fun delete(feed: Feed)
+    suspend fun delete(feedEntity: FeedEntity)
 }
