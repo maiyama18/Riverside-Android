@@ -6,19 +6,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.riverside.ui.screens.root.RiversideTopBar
-
-@Composable
-fun StreamTopBar() {
-    RiversideTopBar(title = "Stream")
-}
+import com.example.riverside.ui.components.WithTopBar
 
 @Composable
 fun StreamScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(text = "Stream")
+    WithTopBar(title = "Stream") {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(text = "Stream")
+        }
     }
 }

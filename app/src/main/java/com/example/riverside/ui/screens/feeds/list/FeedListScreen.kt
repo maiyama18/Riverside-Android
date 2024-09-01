@@ -30,23 +30,10 @@ import com.example.riverside.data.models.Feed
 import com.example.riverside.ui.components.ContentUnavailableAction
 import com.example.riverside.ui.components.ContentUnavailableView
 import com.example.riverside.ui.components.FeedImage
+import com.example.riverside.ui.components.TopBarAction
+import com.example.riverside.ui.components.WithTopBar
 import com.example.riverside.ui.navigation.FeedDetail
 import com.example.riverside.ui.navigation.FeedSubscription
-import com.example.riverside.ui.screens.root.RiversideTopBar
-import com.example.riverside.ui.screens.root.TopBarAction
-
-@Composable
-fun FeedListTopBar(navController: NavHostController) {
-    RiversideTopBar(
-        title = "Feeds",
-        actions = listOf(
-            TopBarAction(
-                icon = Icons.Default.AddCircle,
-                onClick = { navController.navigate(FeedSubscription) },
-            )
-        )
-    )
-}
 
 @Composable
 fun FeedListScreen(
@@ -54,27 +41,38 @@ fun FeedListScreen(
     viewModel: FeedListViewModel = hiltViewModel(),
 ) {
     val feeds by viewModel.allFeeds.collectAsStateWithLifecycle()
-    if (feeds.isEmpty()) {
-        ContentUnavailableView(
-            icon = Icons.Default.FormatListBulleted,
-            title = "No following feed",
-            subtitle = "Follow your favorite feeds to see them here",
-            action = ContentUnavailableAction(
-                title = "Subscribe feed",
-                action = { navController.navigate(FeedSubscription) },
-            ),
+
+    WithTopBar(
+        title = "Feeds",
+        actions = listOf(
+            TopBarAction(
+                icon = Icons.Default.AddCircle,
+                onClick = { navController.navigate(FeedSubscription) },
+            )
         )
-    } else {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            itemsIndexed(feeds) { index, feed ->
-                FeedListItem(
-                    feed = feed,
-                    modifier = Modifier.clickable {
-                        navController.navigate(FeedDetail(feed.url))
-                    },
-                )
-                if (index < feeds.lastIndex) {
-                    Divider()
+    ) {
+        if (feeds.isEmpty()) {
+            ContentUnavailableView(
+                icon = Icons.Default.FormatListBulleted,
+                title = "No following feed",
+                subtitle = "Follow your favorite feeds to see them here",
+                action = ContentUnavailableAction(
+                    title = "Subscribe feed",
+                    action = { navController.navigate(FeedSubscription) },
+                ),
+            )
+        } else {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                itemsIndexed(feeds) { index, feed ->
+                    FeedListItem(
+                        feed = feed,
+                        modifier = Modifier.clickable {
+                            navController.navigate(FeedDetail(feed.url))
+                        },
+                    )
+                    if (index < feeds.lastIndex) {
+                        Divider()
+                    }
                 }
             }
         }

@@ -43,7 +43,6 @@ fun RootScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { RootTopBar(navController = navController) },
         bottomBar = { RootBottomBar(navController = navController) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { innerPadding ->

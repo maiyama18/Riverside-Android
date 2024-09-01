@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.riverside.data.models.Entry
+import com.example.riverside.ui.components.WithTopBar
 
 @Composable
 fun FeedDetailScreen(
@@ -32,12 +33,14 @@ fun FeedDetailScreen(
 ) {
     val feed by viewModel.feed.collectAsStateWithLifecycle()
 
-    feed?.let { currentFeed ->
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            itemsIndexed(currentFeed.entries) { index, entry ->
-                EntryListItem(entry = entry)
-                if (index < currentFeed.entries.lastIndex) {
-                    Divider()
+    WithTopBar(title = feed?.title ?: "") {
+        feed?.let { currentFeed ->
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                itemsIndexed(currentFeed.entries) { index, entry ->
+                    EntryListItem(entry = entry)
+                    if (index < currentFeed.entries.lastIndex) {
+                        Divider()
+                    }
                 }
             }
         }

@@ -14,12 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.riverside.ui.screens.root.RiversideTopBar
-
-@Composable
-fun FeedSubscriptionTopBar() {
-    RiversideTopBar(title = "Feed Subscription")
-}
+import com.example.riverside.ui.components.WithTopBar
 
 @Composable
 fun FeedSubscriptionScreen(
@@ -32,38 +27,40 @@ fun FeedSubscriptionScreen(
         initialValue = false
     )
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        TextField(
-            value = urlInput,
-            onValueChange = { viewModel.onUrlInputChange(it) },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Blog/Feed URL") },
-            placeholder = { Text("https://example.com/feed") },
-        )
+    WithTopBar(title = "Feed Subscription") {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            TextField(
+                value = urlInput,
+                onValueChange = { viewModel.onUrlInputChange(it) },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Blog/Feed URL") },
+                placeholder = { Text("https://example.com/feed") },
+            )
 
-        when (val currentState = state) {
-            FeedSubscriptionScreenState.Idle -> {}
+            when (val currentState = state) {
+                FeedSubscriptionScreenState.Idle -> {}
 
-            FeedSubscriptionScreenState.Loading -> {
-                CircularProgressIndicator()
-            }
+                FeedSubscriptionScreenState.Loading -> {
+                    CircularProgressIndicator()
+                }
 
-            is FeedSubscriptionScreenState.Success -> {
-                FeedSummaryView(
-                    feed = currentState.feed,
-                    feedAlreadySubscribed = currentFeedSubscribed,
-                    onSubscribeClick = { viewModel.onFeedSubscribe(currentState.feed) },
-                )
-            }
+                is FeedSubscriptionScreenState.Success -> {
+                    FeedSummaryView(
+                        feed = currentState.feed,
+                        feedAlreadySubscribed = currentFeedSubscribed,
+                        onSubscribeClick = { viewModel.onFeedSubscribe(currentState.feed) },
+                    )
+                }
 
-            is FeedSubscriptionScreenState.Error -> {
-                FeedErrorView(errorMessage = currentState.message)
+                is FeedSubscriptionScreenState.Error -> {
+                    FeedErrorView(errorMessage = currentState.message)
+                }
             }
         }
     }
