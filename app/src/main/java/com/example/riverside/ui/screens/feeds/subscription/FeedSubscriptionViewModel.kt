@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.riverside.data.network.FeedResponse
 import com.example.riverside.data.repositories.FeedRepository
+import com.example.riverside.ui.controllers.SnackbarController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +27,7 @@ sealed class FeedSubscriptionScreenState {
 @HiltViewModel
 class FeedSubscriptionViewModel @Inject constructor(
     private val feedRepository: FeedRepository,
+    private val snackbarController: SnackbarController,
 ) : ViewModel() {
 
     private val _urlInput = MutableStateFlow("")
@@ -45,8 +47,12 @@ class FeedSubscriptionViewModel @Inject constructor(
         }
     }
 
-    fun onUrlInputChanged(url: String) {
+    fun onUrlInputChange(url: String) {
         _urlInput.value = url
+    }
+
+    fun onFeedSubscribe(feed: FeedResponse) {
+        snackbarController.present("Subscribed to ${feed.title}")
     }
 
     private suspend fun fetchFeed(url: String) {

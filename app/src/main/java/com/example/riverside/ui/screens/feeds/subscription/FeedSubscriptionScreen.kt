@@ -38,7 +38,7 @@ fun FeedSubscriptionScreen(
     ) {
         TextField(
             value = urlInput,
-            onValueChange = { viewModel.onUrlInputChanged(it) },
+            onValueChange = { viewModel.onUrlInputChange(it) },
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Blog/Feed URL") },
             placeholder = { Text("https://example.com/feed") },
@@ -55,7 +55,7 @@ fun FeedSubscriptionScreen(
                 FeedSummaryView(
                     feed = currentState.feed,
                     feedAlreadySubscribed = false, // FIXME
-                    onSubscribeClick = {} // FIXME
+                    onSubscribeClick = { viewModel.onFeedSubscribe(currentState.feed) },
                 )
             }
 
