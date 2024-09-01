@@ -19,7 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.riverside.data.models.Feed
 import com.example.riverside.ui.components.FeedImage
-import io.ktor.http.Url
 
 @Composable
 fun FeedSummaryView(
@@ -51,8 +50,7 @@ fun FeedSummaryView(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                val host = Url(feed.url).host
-                if (host.isNotEmpty()) {
+                feed.host?.let { host ->
                     Text(
                         host,
                         style = MaterialTheme.typography.labelSmall,

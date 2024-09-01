@@ -32,7 +32,6 @@ import com.example.riverside.ui.components.FeedImage
 import com.example.riverside.ui.navigation.FeedSubscription
 import com.example.riverside.ui.screens.root.RiversideTopBar
 import com.example.riverside.ui.screens.root.TopBarAction
-import io.ktor.http.Url
 
 @Composable
 fun FeedListTopBar(navController: NavHostController) {
@@ -92,8 +91,7 @@ fun FeedListItem(feed: Feed) {
         ) {
             Text(text = feed.title, fontWeight = FontWeight.Bold)
 
-            val host = Url(feed.url).host
-            if (host.isNotEmpty()) {
+            feed.host?.let { host ->
                 Text(
                     host,
                     style = MaterialTheme.typography.labelSmall,
