@@ -1,5 +1,6 @@
 package com.example.riverside.ui.screens.feeds.list
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +30,7 @@ import com.example.riverside.data.models.Feed
 import com.example.riverside.ui.components.ContentUnavailableAction
 import com.example.riverside.ui.components.ContentUnavailableView
 import com.example.riverside.ui.components.FeedImage
+import com.example.riverside.ui.navigation.FeedDetail
 import com.example.riverside.ui.navigation.FeedSubscription
 import com.example.riverside.ui.screens.root.RiversideTopBar
 import com.example.riverside.ui.screens.root.TopBarAction
@@ -65,7 +67,12 @@ fun FeedListScreen(
     } else {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             itemsIndexed(feeds) { index, feed ->
-                FeedListItem(feed = feed)
+                FeedListItem(
+                    feed = feed,
+                    modifier = Modifier.clickable {
+                        navController.navigate(FeedDetail(feed.url))
+                    },
+                )
                 if (index < feeds.lastIndex) {
                     Divider()
                 }
@@ -75,9 +82,9 @@ fun FeedListScreen(
 }
 
 @Composable
-fun FeedListItem(feed: Feed) {
+fun FeedListItem(feed: Feed, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),

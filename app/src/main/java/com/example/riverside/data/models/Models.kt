@@ -2,6 +2,12 @@ package com.example.riverside.data.models
 
 import io.ktor.http.Url
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.FormatStringsInDatetimeFormats
+import kotlinx.datetime.format.byUnicodePattern
+import kotlinx.datetime.toLocalDateTime
 
 data class Feed(
     val url: String,
@@ -24,4 +30,12 @@ data class Entry(
     val publishedAt: Instant,
     val content: String?,
     var read: Boolean,
-)
+) {
+    companion object {
+        @OptIn(FormatStringsInDatetimeFormats::class)
+        val entryDateFormat = LocalDateTime.Format { byUnicodePattern("yyyy/MM/dd") }
+    }
+
+    val publishedDateString: String
+        get() = publishedAt.toLocalDateTime(TimeZone.currentSystemDefault()).format(entryDateFormat)
+}

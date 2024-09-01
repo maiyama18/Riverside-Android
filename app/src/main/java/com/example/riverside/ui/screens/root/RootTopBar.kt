@@ -62,6 +62,6 @@ fun RootTopBar(navController: NavHostController, modifier: Modifier = Modifier) 
         currentDestination?.hasRoute(Settings) == true -> SettingsTopBar()
         currentDestination?.hasRoute(FeedSubscription) == true -> FeedSubscriptionTopBar()
 
-        else -> RiversideTopBar(title = "Riverside")
+        else -> {}
     }
 }

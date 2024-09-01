@@ -13,6 +13,13 @@ class FeedRepository @Inject constructor(
     private val feedDao: FeedDao,
     private val feedFetcher: FeedFetcher,
 ) {
+    fun feed(url: String): Flow<Feed?> =
+        feedDao.find(url).map {
+            it.entries.firstOrNull()?.let { (feedEntity, entryEntities) ->
+                feedEntity.toModel(entryEntities)
+            }
+        }
+
     fun subscribedFeeds(): Flow<List<Feed>> =
         feedDao.findAll().map { entities ->
             entities.map { (feedEntity, entryEntities) ->

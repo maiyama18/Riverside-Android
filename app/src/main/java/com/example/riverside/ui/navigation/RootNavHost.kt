@@ -5,6 +5,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
+import com.example.riverside.ui.screens.feeds.detail.FeedDetailScreen
 import com.example.riverside.ui.screens.feeds.list.FeedListScreen
 import com.example.riverside.ui.screens.feeds.subscription.FeedSubscriptionScreen
 import com.example.riverside.ui.screens.settings.SettingsScreen
@@ -22,6 +24,9 @@ object Settings
 
 @Serializable
 object FeedSubscription
+
+@Serializable
+data class FeedDetail(val feedUrl: String)
 
 @Composable
 fun RootNavHost(
@@ -45,6 +50,10 @@ fun RootNavHost(
 
         composable<FeedSubscription> {
             FeedSubscriptionScreen()
+        }
+        composable<FeedDetail> { backStackEntry ->
+            val route: FeedDetail = backStackEntry.toRoute()
+            FeedDetailScreen(feedUrl = route.feedUrl)
         }
     }
 }
