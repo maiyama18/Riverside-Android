@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 
 data class FeedDetailUiState(
     val feed: Feed?,
-    val entries: List<Entry>,
 )
 
 sealed class FeedDetailEvent {
@@ -36,12 +35,12 @@ class FeedDetailViewModel @AssistedInject constructor(
         fun create(feedUrl: String): FeedDetailViewModel
     }
 
-    val state: StateFlow<FeedDetailUiState> = feedRepository.entries(feedUrl)
-        .map { FeedDetailUiState(null, it) }
+    val state: StateFlow<FeedDetailUiState> = feedRepository.feed(feedUrl)
+        .map { FeedDetailUiState(it) }
         .stateIn(
             viewModelScope,
             started = SharingStarted.Lazily,
-            initialValue = FeedDetailUiState(null, emptyList())
+            initialValue = FeedDetailUiState(null)
         )
 
     private var openingEntry: Entry? = null

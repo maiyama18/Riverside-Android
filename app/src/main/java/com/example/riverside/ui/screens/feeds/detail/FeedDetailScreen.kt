@@ -47,25 +47,27 @@ fun FeedDetailScreen(
 ) {
     val context = LocalContext.current
     WithTopBar(title = state.feed?.title ?: "", navController = navController) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            itemsIndexed(
-                state.entries.filter { !it.read },
-                key = { _, entry -> entry.url }) { index, entry ->
-                EntryListItem(
-                    modifier = Modifier
-                        .animateItem(
-                            fadeInSpec = tween(500),
-                            placementSpec = tween(500),
-                            fadeOutSpec = tween(500)
-                        )
-                        .clickable {
-                            onEvent(FeedDetailEvent.EntryClicked(entry))
-                            launchCustomTabs(context, entry.url)
-                        },
-                    entry = entry,
-                )
-                if (index < state.entries.lastIndex) {
-                    Divider()
+        state.feed?.let { feed ->
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                itemsIndexed(
+                    state.feed.entries,
+                    key = { _, entry -> entry.url }) { index, entry ->
+                    EntryListItem(
+                        modifier = Modifier
+                            .animateItem(
+                                fadeInSpec = tween(500),
+                                placementSpec = tween(500),
+                                fadeOutSpec = tween(500)
+                            )
+                            .clickable {
+                                onEvent(FeedDetailEvent.EntryClicked(entry))
+                                launchCustomTabs(context, entry.url)
+                            },
+                        entry = entry,
+                    )
+                    if (index < feed.entries.lastIndex) {
+                        Divider()
+                    }
                 }
             }
         }
