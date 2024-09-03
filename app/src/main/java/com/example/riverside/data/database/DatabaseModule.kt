@@ -22,4 +22,7 @@ object DatabaseModule {
 
     @Provides
     fun provideFeedDao(database: Database): FeedDao = database.feedDao()
+
+    @Provides
+    fun provideEntryDao(database: Database): EntryDao = database.entryDao()
 }

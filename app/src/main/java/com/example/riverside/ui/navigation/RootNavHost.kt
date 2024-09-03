@@ -1,12 +1,16 @@
 package com.example.riverside.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.riverside.ui.screens.feeds.detail.FeedDetailScreen
+import com.example.riverside.ui.screens.feeds.detail.FeedDetailViewModel
 import com.example.riverside.ui.screens.feeds.list.FeedListScreen
 import com.example.riverside.ui.screens.feeds.subscription.FeedSubscriptionScreen
 import com.example.riverside.ui.screens.settings.SettingsScreen
@@ -53,7 +57,17 @@ fun RootNavHost(
         }
         composable<FeedDetail> { backStackEntry ->
             val route: FeedDetail = backStackEntry.toRoute()
-            FeedDetailScreen(feedUrl = route.feedUrl, navController = navController)
+            val viewModel: FeedDetailViewModel = hiltViewModel(
+                creationCallback = { factory: FeedDetailViewModel.Factory ->
+                    factory.create(route.feedUrl)
+                }
+            )
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            FeedDetailScreen(
+                state = state,
+                onEvent = viewModel::onEvent,
+                navController = navController
+            )
         }
     }
 }

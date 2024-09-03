@@ -1,8 +1,10 @@
 package com.example.riverside.data.repositories
 
+import com.example.riverside.data.database.EntryDao
 import com.example.riverside.data.database.EntryEntity
 import com.example.riverside.data.database.FeedDao
 import com.example.riverside.data.database.FeedEntity
+import com.example.riverside.data.models.Entry
 import com.example.riverside.data.models.Feed
 import com.example.riverside.data.network.FeedFetcher
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +13,7 @@ import javax.inject.Inject
 
 class FeedRepository @Inject constructor(
     private val feedDao: FeedDao,
+    private val entryDao: EntryDao,
     private val feedFetcher: FeedFetcher,
 ) {
     fun feed(url: String): Flow<Feed?> =
@@ -30,7 +33,7 @@ class FeedRepository @Inject constructor(
     suspend fun subscribe(feed: Feed) {
         val feedEntity = FeedEntity.fromModel(feed)
         val entryEntities = feed.entries
-            .map { EntryEntity.fromModel(feedEntity.url, it) }
+            .map { EntryEntity.fromModel(it) }
             .sortedByDescending { it.publishedAt }
             .mapIndexed { index, entry ->
                 // Mark entries older than the first 3 as read.
@@ -46,5 +49,15 @@ class FeedRepository @Inject constructor(
     suspend fun fetch(url: String): Feed {
         val feed = feedFetcher.fetchFeed(url, true)
         return feed.toModel()
+    }
+
+    fun entries(feedUrl: String): Flow<List<Entry>> =
+        entryDao.findAll(feedUrl).map { entities ->
+            entities.map { it.toModel() }
+        }
+
+    suspend fun updateEntry(entry: Entry) {
+        val entryEntity = EntryEntity.fromModel(entry)
+        entryDao.update(entryEntity)
     }
 }

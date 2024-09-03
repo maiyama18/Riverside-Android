@@ -21,7 +21,7 @@ data class FeedResponse(
         pageUrl = pageUrl,
         imageUrl = imageUrl,
         overview = overview,
-        entries = entries.map { it.toModel() },
+        entries = entries.map { it.toModel(feedUrl = url) },
     )
 }
 
@@ -32,11 +32,12 @@ data class EntryResponse(
     val publishedAt: String,
     val content: String? = null,
 ) {
-    fun toModel(): Entry = Entry(
+    fun toModel(feedUrl: String): Entry = Entry(
         url = url,
         title = title,
         publishedAt = Instant.parse(publishedAt),
         content = content,
+        feedUrl = feedUrl,
         read = false,
     )
 }

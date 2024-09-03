@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.ktor.serialization.json)
     implementation(libs.coil)
     implementation(libs.coil.compose)
+    implementation(libs.brower)
 
     ksp(libs.google.dagger.hilt.compiler)
     ksp(libs.google.dagger.hilt.android.compiler)

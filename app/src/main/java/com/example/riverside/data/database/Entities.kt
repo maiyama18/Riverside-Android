@@ -44,12 +44,13 @@ data class EntryEntity(
     var read: Boolean = false,
 ) {
     companion object {
-        fun fromModel(feedUrl: String, entry: Entry): EntryEntity = EntryEntity(
+        fun fromModel(entry: Entry): EntryEntity = EntryEntity(
             url = entry.url,
-            feedUrl = feedUrl,
+            feedUrl = entry.feedUrl,
             title = entry.title,
             publishedAt = entry.publishedAt.toString(),
             content = entry.content,
+            read = entry.read,
         )
     }
 
@@ -58,6 +59,7 @@ data class EntryEntity(
         title = title,
         publishedAt = Instant.parse(publishedAt),
         content = content,
+        feedUrl = feedUrl,
         read = read,
     )
 }

@@ -108,6 +108,7 @@ fun FeedSummaryViewPreview() {
                         title = "How to use SwiftUI's @StateObject",
                         publishedAt = Instant.parse("2021-09-01T00:00:00Z"),
                         content = "This article explains how to use SwiftUI's @StateObject property wrapper.",
+                        feedUrl = "https://maiyama4.hatenablog.com/feed",
                         read = false,
                     ),
                     Entry(
@@ -115,6 +116,7 @@ fun FeedSummaryViewPreview() {
                         title = "Introduction to Swift Concurrency",
                         publishedAt = Instant.parse("2021-08-25T00:00:00Z"),
                         content = "This article introduces Swift Concurrency, a new feature in Swift 5.5.",
+                        feedUrl = "https://maiyama4.hatenablog.com/feed",
                         read = false,
                     ),
                 ),

@@ -29,6 +29,7 @@ data class Entry(
     val title: String,
     val publishedAt: Instant,
     val content: String?,
+    val feedUrl: String,
     var read: Boolean,
 ) {
     companion object {
