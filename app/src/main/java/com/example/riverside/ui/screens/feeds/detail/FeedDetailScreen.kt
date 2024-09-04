@@ -13,12 +13,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +39,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
+import com.example.riverside.data.models.EntriesFilter
 import com.example.riverside.data.models.Entry
 import com.example.riverside.ui.components.WithTopBar
 
@@ -46,11 +57,42 @@ fun FeedDetailScreen(
     navController: NavHostController,
 ) {
     val context = LocalContext.current
-    WithTopBar(title = state.feed?.title ?: "", navController = navController) {
+    WithTopBar(
+        title = state.feed?.title ?: "",
+        navController = navController,
+        actions = {
+            var filterMenuExpanded by remember { mutableStateOf(false) }
+            IconButton(onClick = { filterMenuExpanded = !filterMenuExpanded }) {
+                Icon(imageVector = Icons.Default.FilterList, contentDescription = null)
+                DropdownMenu(
+                    expanded = filterMenuExpanded,
+                    onDismissRequest = { filterMenuExpanded = false },
+                ) {
+                    EntriesFilter.entries.map { filter ->
+                        DropdownMenuItem(
+                            text = { Text(filter.displayName) },
+                            trailingIcon = {
+                                if (state.filter == filter) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                    )
+                                }
+                            },
+                            onClick = {
+                                onEvent(FeedDetailEvent.FilterSelected(filter))
+                                filterMenuExpanded = false
+                            },
+                        )
+                    }
+                }
+            }
+        },
+    ) {
         state.feed?.let { feed ->
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 itemsIndexed(
-                    state.feed.entries,
+                    state.visibleEntries,
                     key = { _, entry -> entry.url }) { index, entry ->
                     EntryListItem(
                         modifier = Modifier

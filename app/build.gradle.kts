@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlin.serialization.json)
     implementation(libs.kotlin.datetime)
     implementation(libs.google.dagger.hilt.android)
