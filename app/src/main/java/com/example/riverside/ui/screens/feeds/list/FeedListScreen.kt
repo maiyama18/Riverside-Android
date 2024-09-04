@@ -105,12 +105,14 @@ fun FeedListItem(feed: Feed, modifier: Modifier = Modifier) {
             }
         }
 
-        Text(
-            feed.unreadEntryCount.toString(),
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-        )
+        if (feed.unreadEntryCount > 0) {
+            Text(
+                feed.unreadEntryCount.toString(),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            )
+        }
 
         Icon(
             imageVector = Icons.Default.ChevronRight,
