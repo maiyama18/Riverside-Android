@@ -21,7 +21,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -32,17 +31,12 @@ import com.example.riverside.ui.navigation.Settings
 import com.example.riverside.ui.navigation.Stream
 import com.example.riverside.ui.screens.root.hasRoute
 
-data class TopBarAction(
-    val icon: ImageVector,
-    val onClick: () -> Unit,
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
     title: String,
-    actions: List<TopBarAction>,
     navController: NavHostController,
+    actions: @Composable () -> Unit = {},
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
@@ -80,11 +74,7 @@ fun TopBar(
             overflow = TextOverflow.Ellipsis,
         )
 
-        actions.forEach { action ->
-            IconButton(onClick = action.onClick) {
-                Icon(imageVector = action.icon, contentDescription = null)
-            }
-        }
+        actions()
     }
 }
 
@@ -93,7 +83,7 @@ fun WithTopBar(
     title: String,
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    actions: List<TopBarAction> = emptyList(),
+    actions: @Composable () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize()) {

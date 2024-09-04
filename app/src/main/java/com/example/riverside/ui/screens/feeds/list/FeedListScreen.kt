@@ -10,11 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +31,6 @@ import com.example.riverside.data.models.Feed
 import com.example.riverside.ui.components.ContentUnavailableAction
 import com.example.riverside.ui.components.ContentUnavailableView
 import com.example.riverside.ui.components.FeedImage
-import com.example.riverside.ui.components.TopBarAction
 import com.example.riverside.ui.components.WithTopBar
 import com.example.riverside.ui.navigation.FeedDetail
 import com.example.riverside.ui.navigation.FeedSubscription
@@ -45,12 +45,11 @@ fun FeedListScreen(
     WithTopBar(
         title = "Feeds",
         navController = navController,
-        actions = listOf(
-            TopBarAction(
-                icon = Icons.Default.AddCircle,
-                onClick = { navController.navigate(FeedSubscription) },
-            )
-        )
+        actions = {
+            IconButton(onClick = { navController.navigate(FeedSubscription) }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = null)
+            }
+        }
     ) {
         if (feeds.isEmpty()) {
             ContentUnavailableView(
