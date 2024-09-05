@@ -5,8 +5,10 @@ import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -23,9 +26,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -34,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,6 +49,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
+import com.example.riverside.BuildConfig
 import com.example.riverside.data.models.EntriesFilter
 import com.example.riverside.data.models.Entry
 import com.example.riverside.ui.components.WithTopBar
@@ -105,6 +113,9 @@ fun FeedDetailScreen(
                         state.visibleEntries,
                         key = { _, entry -> entry.url }) { index, entry ->
                         EntryListItem(
+                            entry = entry,
+                            onMarkAsRead = { onEvent(FeedDetailEvent.EntryMarkedAsRead(it)) },
+                            onDelete = { onEvent(FeedDetailEvent.EntryDeleted(it)) },
                             modifier = Modifier
                                 .animateItem(
                                     fadeInSpec = tween(500),
@@ -115,7 +126,6 @@ fun FeedDetailScreen(
                                     onEvent(FeedDetailEvent.EntryClicked(entry))
                                     launchCustomTabs(context, entry.url)
                                 },
-                            entry = entry,
                         )
                         if (index < feed.entries.lastIndex) {
                             Divider()
@@ -142,40 +152,89 @@ fun FeedDetailScreen(
 
 
 @Composable
-fun EntryListItem(entry: Entry, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+fun EntryListItem(
+    entry: Entry,
+    onMarkAsRead: (Entry) -> Unit,
+    onDelete: (Entry) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
+        confirmValueChange = {
+            when (it) {
+                SwipeToDismissBoxValue.StartToEnd -> onDelete(entry)
+                SwipeToDismissBoxValue.EndToStart -> onMarkAsRead(entry)
+                SwipeToDismissBoxValue.Settled -> {}
+            }
+            return@rememberSwipeToDismissBoxState it == SwipeToDismissBoxValue.StartToEnd
+        }
+    )
+    SwipeToDismissBox(
+        state = swipeToDismissBoxState,
+        backgroundContent = {
+            val color = when (swipeToDismissBoxState.targetValue) {
+                SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.primary
+                SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.error
+                SwipeToDismissBoxValue.Settled -> Color.Transparent
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color)
+                    .padding(horizontal = 24.dp),
+                contentAlignment = when (swipeToDismissBoxState.targetValue) {
+                    SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+                    SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+                    SwipeToDismissBoxValue.Settled -> Alignment.Center
+                }
+            ) {
+                val icon = when (swipeToDismissBoxState.targetValue) {
+                    SwipeToDismissBoxValue.EndToStart -> Icons.Default.Check
+                    SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Delete
+                    SwipeToDismissBoxValue.Settled -> null
+                }
+                icon?.let {
+                    Icon(imageVector = it, contentDescription = null, tint = Color.White)
+                }
+            }
+        },
+        enableDismissFromEndToStart = !entry.read,
+        enableDismissFromStartToEnd = BuildConfig.DEBUG,
     ) {
-        val textColor by animateColorAsState(
-            targetValue = MaterialTheme.colorScheme.onSurface.copy(alpha = if (entry.read) 0.4f else 1.0f),
-            animationSpec = tween(durationMillis = 500),
-            label = "text color",
-        )
-        Text(
-            entry.publishedDateString,
-            style = MaterialTheme.typography.bodySmall,
-            color = textColor,
-        )
-        Text(
-            entry.title,
-            fontWeight = FontWeight.Bold,
-            color = textColor,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
-
-        entry.content?.let {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            val textColor by animateColorAsState(
+                targetValue = MaterialTheme.colorScheme.onSurface.copy(alpha = if (entry.read) 0.4f else 1.0f),
+                animationSpec = tween(durationMillis = 500),
+                label = "text color",
+            )
             Text(
-                it,
+                entry.publishedDateString,
                 style = MaterialTheme.typography.bodySmall,
                 color = textColor,
-                maxLines = 3,
+            )
+            Text(
+                entry.title,
+                fontWeight = FontWeight.Bold,
+                color = textColor,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
+
+            entry.content?.let {
+                Text(
+                    it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = textColor,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

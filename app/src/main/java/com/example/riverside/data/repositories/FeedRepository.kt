@@ -71,4 +71,9 @@ class FeedRepository @Inject constructor(
         val entryEntity = EntryEntity.fromModel(entry)
         entryDao.update(entryEntity)
     }
+
+    suspend fun deleteEntry(entry: Entry) {
+        val entryEntity = EntryEntity.fromModel(entry)
+        entryDao.delete(entryEntity)
+    }
 }

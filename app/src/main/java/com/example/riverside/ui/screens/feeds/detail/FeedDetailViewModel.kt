@@ -34,6 +34,8 @@ sealed class FeedDetailEvent {
     data object Resumed : FeedDetailEvent()
     data object PullToRefreshed : FeedDetailEvent()
     data class EntryClicked(val entry: Entry) : FeedDetailEvent()
+    data class EntryDeleted(val entry: Entry) : FeedDetailEvent()
+    data class EntryMarkedAsRead(val entry: Entry) : FeedDetailEvent()
     data class FilterSelected(val filter: EntriesFilter) : FeedDetailEvent()
 }
 
@@ -88,6 +90,14 @@ class FeedDetailViewModel @AssistedInject constructor(
             }
 
             is FeedDetailEvent.EntryClicked -> openingEntry = event.entry
+            is FeedDetailEvent.EntryMarkedAsRead -> viewModelScope.launch {
+                feedRepository.updateEntry(event.entry.copy(read = true))
+            }
+
+            is FeedDetailEvent.EntryDeleted -> viewModelScope.launch {
+                feedRepository.deleteEntry(event.entry)
+            }
+
             is FeedDetailEvent.FilterSelected -> viewModelScope.launch {
                 preferencesRepository.setFeedDetailEntriesFilter(event.filter)
             }

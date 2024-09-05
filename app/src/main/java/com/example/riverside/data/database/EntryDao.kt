@@ -1,6 +1,7 @@
 package com.example.riverside.data.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
@@ -12,4 +13,7 @@ interface EntryDao {
 
     @Update
     suspend fun update(entryEntity: EntryEntity)
+
+    @Delete
+    suspend fun delete(entryEntity: EntryEntity)
 }
