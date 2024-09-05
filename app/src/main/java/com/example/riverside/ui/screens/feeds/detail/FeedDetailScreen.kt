@@ -19,10 +19,13 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -50,6 +53,7 @@ fun launchCustomTabs(context: Context, url: String) {
         .launchUrl(context, Uri.parse(url))
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedDetailScreen(
     state: FeedDetailUiState,
@@ -90,25 +94,32 @@ fun FeedDetailScreen(
         },
     ) {
         state.feed?.let { feed ->
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                itemsIndexed(
-                    state.visibleEntries,
-                    key = { _, entry -> entry.url }) { index, entry ->
-                    EntryListItem(
-                        modifier = Modifier
-                            .animateItem(
-                                fadeInSpec = tween(500),
-                                placementSpec = tween(500),
-                                fadeOutSpec = tween(500)
-                            )
-                            .clickable {
-                                onEvent(FeedDetailEvent.EntryClicked(entry))
-                                launchCustomTabs(context, entry.url)
-                            },
-                        entry = entry,
-                    )
-                    if (index < feed.entries.lastIndex) {
-                        Divider()
+            val pullToRefreshState = rememberPullToRefreshState()
+            PullToRefreshBox(
+                state = pullToRefreshState,
+                isRefreshing = state.isRefreshing,
+                onRefresh = { onEvent(FeedDetailEvent.PullToRefreshed) },
+            ) {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    itemsIndexed(
+                        state.visibleEntries,
+                        key = { _, entry -> entry.url }) { index, entry ->
+                        EntryListItem(
+                            modifier = Modifier
+                                .animateItem(
+                                    fadeInSpec = tween(500),
+                                    placementSpec = tween(500),
+                                    fadeOutSpec = tween(500)
+                                )
+                                .clickable {
+                                    onEvent(FeedDetailEvent.EntryClicked(entry))
+                                    launchCustomTabs(context, entry.url)
+                                },
+                            entry = entry,
+                        )
+                        if (index < feed.entries.lastIndex) {
+                            Divider()
+                        }
                     }
                 }
             }

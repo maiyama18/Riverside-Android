@@ -12,15 +12,15 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class FeedDetailUiState(
     val feed: Feed?,
     val filter: EntriesFilter,
+    val isRefreshing: Boolean,
 ) {
     val visibleEntries: List<Entry> = feed?.entries?.filter {
         when (filter) {
@@ -32,6 +32,7 @@ data class FeedDetailUiState(
 
 sealed class FeedDetailEvent {
     data object Resumed : FeedDetailEvent()
+    data object PullToRefreshed : FeedDetailEvent()
     data class EntryClicked(val entry: Entry) : FeedDetailEvent()
     data class FilterSelected(val filter: EntriesFilter) : FeedDetailEvent()
 }
@@ -47,17 +48,20 @@ class FeedDetailViewModel @AssistedInject constructor(
         fun create(feedUrl: String): FeedDetailViewModel
     }
 
-    val state: StateFlow<FeedDetailUiState> = feedRepository.feed(feedUrl)
-        .combine(preferencesRepository.feedDetailEntriesFilter) { feed, filter ->
-            FeedDetailUiState(feed, filter)
-        }
-        .stateIn(
-            viewModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = FeedDetailUiState(null, EntriesFilter.ALL)
-        )
+    private val _state: MutableStateFlow<FeedDetailUiState> =
+        MutableStateFlow(FeedDetailUiState(null, EntriesFilter.ALL, false))
+    val state: StateFlow<FeedDetailUiState> = _state
 
     private var openingEntry: Entry? = null
+
+    init {
+        viewModelScope.launch {
+            feedRepository.feed(feedUrl).collect { feed -> _state.update { it.copy(feed = feed) } }
+            preferencesRepository.feedDetailEntriesFilter.collect { filter ->
+                _state.update { it.copy(filter = filter) }
+            }
+        }
+    }
 
     fun onEvent(event: FeedDetailEvent) {
         when (event) {
@@ -67,6 +71,19 @@ class FeedDetailViewModel @AssistedInject constructor(
                         feedRepository.updateEntry(entry.copy(read = true))
                         openingEntry = null
                     }
+                }
+            }
+
+            FeedDetailEvent.PullToRefreshed -> viewModelScope.launch {
+                _state.update { it.copy(isRefreshing = true) }
+                try {
+                    state.value.feed?.let { feed ->
+                        feedRepository.updateFeed(feedUrl, existingFeed = feed)
+                    }
+                } catch (e: Exception) {
+                    // TODO: Handle error
+                } finally {
+                    _state.update { it.copy(isRefreshing = false) }
                 }
             }
 

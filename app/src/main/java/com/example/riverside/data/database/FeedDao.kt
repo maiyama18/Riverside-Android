@@ -23,10 +23,10 @@ interface FeedDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(entryEntities: List<EntryEntity>)
 
-    @Query("SELECT * FROM feeds JOIN entries ON feeds.url = entries.feedUrl WHERE feeds.url = :url")
+    @Query("SELECT * FROM feeds JOIN entries ON feeds.url = entries.feedUrl WHERE feeds.url = :url ORDER BY entries.publishedAt DESC")
     fun find(url: String): Flow<Map<FeedEntity, List<EntryEntity>>>
 
-    @Query("SELECT * FROM feeds JOIN entries ON feeds.url = entries.feedUrl")
+    @Query("SELECT * FROM feeds JOIN entries ON feeds.url = entries.feedUrl ORDER BY entries.publishedAt DESC")
     fun findAll(): Flow<Map<FeedEntity, List<EntryEntity>>>
 
     @Update

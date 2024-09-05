@@ -51,6 +51,17 @@ class FeedRepository @Inject constructor(
         return feed.toModel()
     }
 
+    suspend fun updateFeed(url: String, existingFeed: Feed) {
+        val feed = feedFetcher.fetchFeed(url, true)
+
+        val feedEntity = FeedEntity.fromModel(feed.toModel())
+        val newEntryEntities = feed.entries.map { EntryEntity.fromModel(it.toModel(feed.url)) }
+            .filter { entry -> existingFeed.entries.none { it.url == entry.url } }
+
+        feedDao.update(feedEntity)
+        feedDao.insert(newEntryEntities)
+    }
+
     fun entries(feedUrl: String): Flow<List<Entry>> =
         entryDao.findAll(feedUrl).map { entities ->
             entities.map { it.toModel() }
