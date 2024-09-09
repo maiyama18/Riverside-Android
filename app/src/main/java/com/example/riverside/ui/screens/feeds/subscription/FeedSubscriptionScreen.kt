@@ -43,6 +43,7 @@ fun FeedSubscriptionScreen(
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Blog/Feed URL") },
                 placeholder = { Text("https://example.com/feed") },
+                singleLine = true,
             )
 
             when (val currentState = state) {
