@@ -99,6 +99,7 @@ class FeedDetailViewModel @AssistedInject constructor(
             }
 
             is FeedDetailEvent.FilterSelected -> viewModelScope.launch {
+                _state.update { it.copy(filter = event.filter) }
                 preferencesRepository.setFeedDetailEntriesFilter(event.filter)
             }
         }
