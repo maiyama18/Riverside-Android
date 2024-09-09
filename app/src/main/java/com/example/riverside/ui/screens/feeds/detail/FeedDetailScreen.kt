@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FilterList
@@ -52,6 +53,7 @@ import androidx.navigation.NavHostController
 import com.example.riverside.BuildConfig
 import com.example.riverside.data.models.EntriesFilter
 import com.example.riverside.data.models.Entry
+import com.example.riverside.ui.components.ContentUnavailableView
 import com.example.riverside.ui.components.WithTopBar
 
 fun launchCustomTabs(context: Context, url: String) {
@@ -108,27 +110,34 @@ fun FeedDetailScreen(
                 isRefreshing = state.isRefreshing,
                 onRefresh = { onEvent(FeedDetailEvent.PullToRefreshed) },
             ) {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    itemsIndexed(
-                        state.visibleEntries,
-                        key = { _, entry -> entry.url }) { index, entry ->
-                        EntryListItem(
-                            entry = entry,
-                            onMarkAsRead = { onEvent(FeedDetailEvent.EntryMarkedAsRead(it)) },
-                            onDelete = { onEvent(FeedDetailEvent.EntryDeleted(it)) },
-                            modifier = Modifier
-                                .animateItem(
-                                    fadeInSpec = tween(500),
-                                    placementSpec = tween(500),
-                                    fadeOutSpec = tween(500)
-                                )
-                                .clickable {
-                                    onEvent(FeedDetailEvent.EntryClicked(entry))
-                                    launchCustomTabs(context, entry.url)
-                                },
-                        )
-                        if (index < feed.entries.lastIndex) {
-                            Divider()
+                if (state.visibleEntries.isEmpty()) {
+                    ContentUnavailableView(
+                        icon = Icons.AutoMirrored.Filled.FormatListBulleted,
+                        title = "You've read all entries",
+                    )
+                } else {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        itemsIndexed(
+                            state.visibleEntries,
+                            key = { _, entry -> entry.url }) { index, entry ->
+                            EntryListItem(
+                                entry = entry,
+                                onMarkAsRead = { onEvent(FeedDetailEvent.EntryMarkedAsRead(it)) },
+                                onDelete = { onEvent(FeedDetailEvent.EntryDeleted(it)) },
+                                modifier = Modifier
+                                    .animateItem(
+                                        fadeInSpec = tween(500),
+                                        placementSpec = tween(500),
+                                        fadeOutSpec = tween(500)
+                                    )
+                                    .clickable {
+                                        onEvent(FeedDetailEvent.EntryClicked(entry))
+                                        launchCustomTabs(context, entry.url)
+                                    },
+                            )
+                            if (index < feed.entries.lastIndex) {
+                                Divider()
+                            }
                         }
                     }
                 }

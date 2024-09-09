@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FormatListBulleted
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -82,7 +82,7 @@ fun ContentUnavailableView(
 @Composable
 private fun ContentUnavailableViewPreview() {
     ContentUnavailableView(
-        icon = Icons.Default.FormatListBulleted,
+        icon = Icons.AutoMirrored.Filled.FormatListBulleted,
         title = "No following feed",
         subtitle = "Follow your favorite feeds to see them here",
         action = ContentUnavailableAction(
