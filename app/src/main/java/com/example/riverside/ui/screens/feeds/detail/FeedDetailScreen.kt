@@ -72,7 +72,7 @@ fun FeedDetailScreen(
 ) {
     val context = LocalContext.current
     WithTopBar(
-        title = state.feed?.title ?: "",
+        title = state.title,
         navController = navController,
         actions = {
             var filterMenuExpanded by remember { mutableStateOf(false) }

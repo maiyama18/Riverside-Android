@@ -28,6 +28,15 @@ data class FeedDetailUiState(
             EntriesFilter.UNREAD -> !it.read
         }
     } ?: emptyList()
+
+    val title: String
+        get() = feed?.let {
+            if (it.unreadEntryCount > 0) {
+                "${it.title} (${it.unreadEntryCount})"
+            } else {
+                it.title
+            }
+        } ?: ""
 }
 
 sealed class FeedDetailEvent {
