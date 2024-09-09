@@ -51,27 +51,29 @@ fun FeedListScreen(
             }
         }
     ) {
-        if (feeds.isEmpty()) {
-            ContentUnavailableView(
-                icon = Icons.AutoMirrored.Filled.FormatListBulleted,
-                title = "No following feed",
-                subtitle = "Follow your favorite feeds to see them here",
-                action = ContentUnavailableAction(
-                    title = "Subscribe feed",
-                    action = { navController.navigate(FeedSubscription) },
-                ),
-            )
-        } else {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                itemsIndexed(feeds) { index, feed ->
-                    FeedListItem(
-                        feed = feed,
-                        modifier = Modifier.clickable {
-                            navController.navigate(FeedDetail(feed.url))
-                        },
-                    )
-                    if (index < feeds.lastIndex) {
-                        Divider()
+        feeds?.let { feeds ->
+            if (feeds.isEmpty()) {
+                ContentUnavailableView(
+                    icon = Icons.AutoMirrored.Filled.FormatListBulleted,
+                    title = "No following feed",
+                    subtitle = "Follow your favorite feeds to see them here",
+                    action = ContentUnavailableAction(
+                        title = "Subscribe feed",
+                        action = { navController.navigate(FeedSubscription) },
+                    ),
+                )
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    itemsIndexed(feeds) { index, feed ->
+                        FeedListItem(
+                            feed = feed,
+                            modifier = Modifier.clickable {
+                                navController.navigate(FeedDetail(feed.url))
+                            },
+                        )
+                        if (index < feeds.lastIndex) {
+                            Divider()
+                        }
                     }
                 }
             }
