@@ -15,6 +15,7 @@ import com.example.riverside.ui.screens.feeds.list.FeedListScreen
 import com.example.riverside.ui.screens.feeds.subscription.FeedSubscriptionScreen
 import com.example.riverside.ui.screens.settings.SettingsScreen
 import com.example.riverside.ui.screens.stream.StreamScreen
+import com.example.riverside.ui.screens.stream.StreamViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -43,7 +44,13 @@ fun RootNavHost(
         modifier = modifier
     ) {
         composable<Stream> {
-            StreamScreen(navController = navController)
+            val viewModel: StreamViewModel = hiltViewModel()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            StreamScreen(
+                state = state,
+                onEvent = viewModel::onEvent,
+                navController = navController,
+            )
         }
         composable<FeedList> {
             FeedListScreen(navController = navController)

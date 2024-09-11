@@ -20,10 +20,10 @@ import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -119,7 +119,8 @@ fun FeedDetailScreen(
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         itemsIndexed(
                             state.visibleEntries,
-                            key = { _, entry -> entry.url }) { index, entry ->
+                            key = { _, entry -> entry.url },
+                        ) { index, entry ->
                             EntryListItem(
                                 entry = entry,
                                 onMarkAsRead = { onEvent(FeedDetailEvent.EntryMarkedAsRead(it)) },
@@ -136,7 +137,7 @@ fun FeedDetailScreen(
                                     },
                             )
                             if (index < feed.entries.lastIndex) {
-                                Divider()
+                                HorizontalDivider(thickness = 0.5.dp)
                             }
                         }
                     }
