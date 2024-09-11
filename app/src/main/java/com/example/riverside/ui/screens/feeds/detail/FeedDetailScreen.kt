@@ -1,8 +1,5 @@
 package com.example.riverside.ui.screens.feeds.detail
 
-import android.content.Context
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -53,13 +50,6 @@ import com.example.riverside.ui.components.ContentUnavailableView
 import com.example.riverside.ui.components.SwipeAction
 import com.example.riverside.ui.components.SwipeListItem
 import com.example.riverside.ui.components.WithTopBar
-
-fun launchCustomTabs(context: Context, url: String) {
-    CustomTabsIntent.Builder()
-        .setUrlBarHidingEnabled(false)
-        .build()
-        .launchUrl(context, Uri.parse(url))
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,8 +121,7 @@ fun FeedDetailScreen(
                                         fadeOutSpec = tween(500)
                                     )
                                     .clickable {
-                                        onEvent(FeedDetailEvent.EntryClicked(entry))
-                                        launchCustomTabs(context, entry.url)
+                                        onEvent(FeedDetailEvent.EntryClicked(context, entry))
                                     },
                             )
                             if (index < feed.entries.lastIndex) {

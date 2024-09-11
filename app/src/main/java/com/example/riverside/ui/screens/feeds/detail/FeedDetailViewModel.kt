@@ -1,5 +1,6 @@
 package com.example.riverside.ui.screens.feeds.detail
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.riverside.data.models.EntriesFilter
@@ -7,6 +8,7 @@ import com.example.riverside.data.models.Entry
 import com.example.riverside.data.models.Feed
 import com.example.riverside.data.repositories.FeedRepository
 import com.example.riverside.data.repositories.PreferencesRepository
+import com.example.riverside.ui.controllers.CustomTabsController
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -42,7 +44,7 @@ data class FeedDetailUiState(
 sealed class FeedDetailEvent {
     data object Resumed : FeedDetailEvent()
     data object PullToRefreshed : FeedDetailEvent()
-    data class EntryClicked(val entry: Entry) : FeedDetailEvent()
+    data class EntryClicked(val context: Context, val entry: Entry) : FeedDetailEvent()
     data class EntryDeleted(val entry: Entry) : FeedDetailEvent()
     data class EntryMarkedAsRead(val entry: Entry) : FeedDetailEvent()
     data class EntryMarkedAsUnread(val entry: Entry) : FeedDetailEvent()
@@ -54,6 +56,7 @@ class FeedDetailViewModel @AssistedInject constructor(
     @Assisted private val feedUrl: String,
     private val feedRepository: FeedRepository,
     private val preferencesRepository: PreferencesRepository,
+    private val customTabsController: CustomTabsController,
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {
@@ -99,7 +102,11 @@ class FeedDetailViewModel @AssistedInject constructor(
                 }
             }
 
-            is FeedDetailEvent.EntryClicked -> openingEntry = event.entry
+            is FeedDetailEvent.EntryClicked -> {
+                openingEntry = event.entry
+                customTabsController.launch(event.context, event.entry.url)
+            }
+
             is FeedDetailEvent.EntryMarkedAsRead -> viewModelScope.launch {
                 feedRepository.updateEntry(event.entry.copy(read = true))
             }
