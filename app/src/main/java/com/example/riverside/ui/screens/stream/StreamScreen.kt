@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
@@ -53,7 +53,7 @@ fun StreamScreen(
             contentAlignment = Alignment.Center,
         ) {
             state.sections?.let { sections ->
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                LazyColumn {
                     sections.forEach { section ->
                         stickyHeader {
                             Text(
@@ -69,14 +69,20 @@ fun StreamScreen(
                             )
                             HorizontalDivider(thickness = 0.5.dp)
                         }
-                        items(section.entries) { entry ->
+                        itemsIndexed(
+                            section.entries,
+                            key = { _, entry -> entry.entry.url },
+                        ) { index, entry ->
                             StreamItem(
                                 entry = entry,
                                 onMarkAsRead = { onEvent(StreamEvent.EntryMarkedAsRead(it)) },
                                 onDelete = { onEvent(StreamEvent.EntryDeleted(it)) },
                                 onFeedTitleTap = { navController.navigate(FeedDetail(it)) },
                             )
-                            HorizontalDivider(thickness = 0.5.dp)
+                            HorizontalDivider(
+                                modifier = Modifier.padding(bottom = if (index == section.entries.lastIndex) 16.dp else 0.dp),
+                                thickness = 0.5.dp,
+                            )
                         }
                     }
                 }
