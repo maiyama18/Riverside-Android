@@ -18,17 +18,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.riverside.BuildConfig
 import com.example.riverside.ui.components.FeedImage
+import com.example.riverside.ui.components.SwipeAction
+import com.example.riverside.ui.components.SwipeListItem
 import com.example.riverside.ui.components.WithTopBar
 import com.example.riverside.ui.navigation.FeedDetail
 import kotlinx.datetime.LocalDate
@@ -96,47 +93,17 @@ fun StreamItem(
     onFeedTitleTap: (feedUrl: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
-        confirmValueChange = {
-            when (it) {
-                SwipeToDismissBoxValue.StartToEnd -> onDelete(entry)
-                SwipeToDismissBoxValue.EndToStart -> onMarkAsRead(entry)
-                SwipeToDismissBoxValue.Settled -> {}
-            }
-            return@rememberSwipeToDismissBoxState it == SwipeToDismissBoxValue.StartToEnd
-        }
-    )
-    SwipeToDismissBox(
-        state = swipeToDismissBoxState,
-        backgroundContent = {
-            val color = when (swipeToDismissBoxState.targetValue) {
-                SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.primary
-                SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.error
-                SwipeToDismissBoxValue.Settled -> Color.Transparent
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color)
-                    .padding(horizontal = 24.dp),
-                contentAlignment = when (swipeToDismissBoxState.targetValue) {
-                    SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
-                    SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
-                    SwipeToDismissBoxValue.Settled -> Alignment.Center
-                }
-            ) {
-                val icon = when (swipeToDismissBoxState.targetValue) {
-                    SwipeToDismissBoxValue.EndToStart -> Icons.Default.Check
-                    SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Delete
-                    SwipeToDismissBoxValue.Settled -> null
-                }
-                icon?.let {
-                    Icon(imageVector = it, contentDescription = null, tint = Color.White)
-                }
-            }
-        },
-        enableDismissFromEndToStart = !entry.entry.read,
-        enableDismissFromStartToEnd = BuildConfig.DEBUG,
+    SwipeListItem(
+        startAction = if (BuildConfig.DEBUG) SwipeAction(
+            icon = Icons.Default.Delete,
+            background = MaterialTheme.colorScheme.error,
+            action = { onDelete(entry) },
+        ) else null,
+        endAction = if (!entry.entry.read) SwipeAction(
+            icon = Icons.Default.Check,
+            background = MaterialTheme.colorScheme.primary,
+            action = { onMarkAsRead(entry) },
+        ) else null,
     ) {
         Column(
             modifier = modifier

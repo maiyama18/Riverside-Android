@@ -8,7 +8,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,12 +26,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -41,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,6 +49,8 @@ import com.example.riverside.BuildConfig
 import com.example.riverside.data.models.EntriesFilter
 import com.example.riverside.data.models.Entry
 import com.example.riverside.ui.components.ContentUnavailableView
+import com.example.riverside.ui.components.SwipeAction
+import com.example.riverside.ui.components.SwipeListItem
 import com.example.riverside.ui.components.WithTopBar
 
 fun launchCustomTabs(context: Context, url: String) {
@@ -168,47 +165,17 @@ fun EntryListItem(
     onDelete: (Entry) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
-        confirmValueChange = {
-            when (it) {
-                SwipeToDismissBoxValue.StartToEnd -> onDelete(entry)
-                SwipeToDismissBoxValue.EndToStart -> onMarkAsRead(entry)
-                SwipeToDismissBoxValue.Settled -> {}
-            }
-            return@rememberSwipeToDismissBoxState it == SwipeToDismissBoxValue.StartToEnd
-        }
-    )
-    SwipeToDismissBox(
-        state = swipeToDismissBoxState,
-        backgroundContent = {
-            val color = when (swipeToDismissBoxState.targetValue) {
-                SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.primary
-                SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.error
-                SwipeToDismissBoxValue.Settled -> Color.Transparent
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color)
-                    .padding(horizontal = 24.dp),
-                contentAlignment = when (swipeToDismissBoxState.targetValue) {
-                    SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
-                    SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
-                    SwipeToDismissBoxValue.Settled -> Alignment.Center
-                }
-            ) {
-                val icon = when (swipeToDismissBoxState.targetValue) {
-                    SwipeToDismissBoxValue.EndToStart -> Icons.Default.Check
-                    SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Delete
-                    SwipeToDismissBoxValue.Settled -> null
-                }
-                icon?.let {
-                    Icon(imageVector = it, contentDescription = null, tint = Color.White)
-                }
-            }
-        },
-        enableDismissFromEndToStart = !entry.read,
-        enableDismissFromStartToEnd = BuildConfig.DEBUG,
+    SwipeListItem(
+        startAction = if (BuildConfig.DEBUG) SwipeAction(
+            icon = Icons.Default.Delete,
+            background = MaterialTheme.colorScheme.error,
+            action = { onDelete(entry) },
+        ) else null,
+        endAction = if (!entry.read) SwipeAction(
+            icon = Icons.Default.Check,
+            background = MaterialTheme.colorScheme.primary,
+            action = { onMarkAsRead(entry) },
+        ) else null,
     ) {
         Column(
             modifier = modifier
