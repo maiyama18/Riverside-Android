@@ -48,6 +48,7 @@ data class StreamUiState(
 
 sealed class StreamEvent {
     data class EntryMarkedAsRead(val entry: StreamEntry) : StreamEvent()
+    data class EntryMarkedAsUnread(val entry: StreamEntry) : StreamEvent()
     data class EntryDeleted(val entry: StreamEntry) : StreamEvent()
 }
 
@@ -69,6 +70,10 @@ class StreamViewModel @Inject constructor(
         when (event) {
             is StreamEvent.EntryMarkedAsRead -> viewModelScope.launch {
                 feedRepository.updateEntry(event.entry.entry.copy(read = true))
+            }
+
+            is StreamEvent.EntryMarkedAsUnread -> viewModelScope.launch {
+                feedRepository.updateEntry(event.entry.entry.copy(read = false))
             }
 
             is StreamEvent.EntryDeleted -> viewModelScope.launch {

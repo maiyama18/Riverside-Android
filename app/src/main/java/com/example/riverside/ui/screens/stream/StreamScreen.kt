@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.HorizontalDivider
@@ -76,6 +77,7 @@ fun StreamScreen(
                             StreamItem(
                                 entry = entry,
                                 onMarkAsRead = { onEvent(StreamEvent.EntryMarkedAsRead(it)) },
+                                onMarkAsUnread = { onEvent(StreamEvent.EntryMarkedAsUnread(it)) },
                                 onDelete = { onEvent(StreamEvent.EntryDeleted(it)) },
                                 onFeedTitleTap = { navController.navigate(FeedDetail(it)) },
                             )
@@ -95,6 +97,7 @@ fun StreamScreen(
 fun StreamItem(
     entry: StreamEntry,
     onMarkAsRead: (StreamEntry) -> Unit,
+    onMarkAsUnread: (StreamEntry) -> Unit,
     onDelete: (StreamEntry) -> Unit,
     onFeedTitleTap: (feedUrl: String) -> Unit,
     modifier: Modifier = Modifier
@@ -105,11 +108,15 @@ fun StreamItem(
             background = MaterialTheme.colorScheme.error,
             action = { onDelete(entry) },
         ) else null,
-        endAction = if (!entry.entry.read) SwipeAction(
+        endAction = if (entry.entry.read) SwipeAction(
+            icon = Icons.AutoMirrored.Filled.Undo,
+            background = MaterialTheme.colorScheme.primaryContainer,
+            action = { onMarkAsUnread(entry) },
+        ) else SwipeAction(
             icon = Icons.Default.Check,
             background = MaterialTheme.colorScheme.primary,
             action = { onMarkAsRead(entry) },
-        ) else null,
+        ),
     ) {
         Column(
             modifier = modifier

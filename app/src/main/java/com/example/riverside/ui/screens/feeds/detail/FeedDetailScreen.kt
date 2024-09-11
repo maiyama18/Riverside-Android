@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FilterList
@@ -121,6 +122,7 @@ fun FeedDetailScreen(
                             EntryListItem(
                                 entry = entry,
                                 onMarkAsRead = { onEvent(FeedDetailEvent.EntryMarkedAsRead(it)) },
+                                onMarkAsUnread = { onEvent(FeedDetailEvent.EntryMarkedAsUnread(it)) },
                                 onDelete = { onEvent(FeedDetailEvent.EntryDeleted(it)) },
                                 modifier = Modifier
                                     .animateItem(
@@ -162,6 +164,7 @@ fun FeedDetailScreen(
 fun EntryListItem(
     entry: Entry,
     onMarkAsRead: (Entry) -> Unit,
+    onMarkAsUnread: (Entry) -> Unit,
     onDelete: (Entry) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -171,11 +174,15 @@ fun EntryListItem(
             background = MaterialTheme.colorScheme.error,
             action = { onDelete(entry) },
         ) else null,
-        endAction = if (!entry.read) SwipeAction(
+        endAction = if (entry.read) SwipeAction(
+            icon = Icons.AutoMirrored.Filled.Undo,
+            background = MaterialTheme.colorScheme.primaryContainer,
+            action = { onMarkAsUnread(entry) },
+        ) else SwipeAction(
             icon = Icons.Default.Check,
             background = MaterialTheme.colorScheme.primary,
             action = { onMarkAsRead(entry) },
-        ) else null,
+        ),
     ) {
         Column(
             modifier = modifier
