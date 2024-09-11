@@ -22,13 +22,18 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.example.riverside.BuildConfig
 import com.example.riverside.ui.components.FeedImage
@@ -48,6 +53,7 @@ fun StreamScreen(
     onEvent: (StreamEvent) -> Unit,
     navController: NavHostController,
 ) {
+    val context = LocalContext.current
     WithTopBar(title = "Stream", navController = navController) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -76,6 +82,15 @@ fun StreamScreen(
                         ) { index, entry ->
                             StreamItem(
                                 entry = entry,
+                                modifier = Modifier
+                                    .animateItem(
+                                        fadeInSpec = tween(500),
+                                        placementSpec = tween(500),
+                                        fadeOutSpec = tween(500)
+                                    )
+                                    .clickable {
+                                        onEvent(StreamEvent.EntryClicked(context, entry))
+                                    },
                                 onMarkAsRead = { onEvent(StreamEvent.EntryMarkedAsRead(it)) },
                                 onMarkAsUnread = { onEvent(StreamEvent.EntryMarkedAsUnread(it)) },
                                 onDelete = { onEvent(StreamEvent.EntryDeleted(it)) },
@@ -86,6 +101,19 @@ fun StreamScreen(
                                 thickness = 0.5.dp,
                             )
                         }
+                    }
+                }
+
+                val lifecycleOwner = LocalLifecycleOwner.current
+                DisposableEffect(lifecycleOwner) {
+                    val observer = LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_RESUME) {
+                            onEvent(StreamEvent.Resumed)
+                        }
+                    }
+                    lifecycleOwner.lifecycle.addObserver(observer)
+                    onDispose {
+                        lifecycleOwner.lifecycle.removeObserver(observer)
                     }
                 }
             }
@@ -155,7 +183,7 @@ fun StreamItem(
                             onFeedTitleTap(entry.feedUrl)
                         },
                         style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = textColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )

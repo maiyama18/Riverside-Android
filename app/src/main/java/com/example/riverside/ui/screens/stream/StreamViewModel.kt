@@ -1,11 +1,14 @@
 package com.example.riverside.ui.screens.stream
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.riverside.data.models.Entry
 import com.example.riverside.data.models.Feed
 import com.example.riverside.data.repositories.FeedRepository
+import com.example.riverside.ui.controllers.CustomTabsController
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -47,17 +50,22 @@ data class StreamUiState(
 }
 
 sealed class StreamEvent {
+    data object Resumed : StreamEvent()
     data class EntryMarkedAsRead(val entry: StreamEntry) : StreamEvent()
     data class EntryMarkedAsUnread(val entry: StreamEntry) : StreamEvent()
+    data class EntryClicked(val context: Context, val entry: StreamEntry) : StreamEvent()
     data class EntryDeleted(val entry: StreamEntry) : StreamEvent()
 }
 
 @HiltViewModel
 class StreamViewModel @Inject constructor(
     private val feedRepository: FeedRepository,
+    private val customTabsController: CustomTabsController,
 ) : ViewModel() {
     private val _state: MutableStateFlow<StreamUiState> = MutableStateFlow(StreamUiState(null))
     val state: StateFlow<StreamUiState> = _state
+
+    private var openingEntry: StreamEntry? = null
 
     init {
         viewModelScope.launch {
@@ -68,12 +76,24 @@ class StreamViewModel @Inject constructor(
 
     fun onEvent(event: StreamEvent) {
         when (event) {
+            StreamEvent.Resumed -> openingEntry?.let { entry ->
+                viewModelScope.launch(Dispatchers.IO) {
+                    feedRepository.updateEntry(entry.entry.copy(read = true))
+                    openingEntry = null
+                }
+            }
+
             is StreamEvent.EntryMarkedAsRead -> viewModelScope.launch {
                 feedRepository.updateEntry(event.entry.entry.copy(read = true))
             }
 
             is StreamEvent.EntryMarkedAsUnread -> viewModelScope.launch {
                 feedRepository.updateEntry(event.entry.entry.copy(read = false))
+            }
+
+            is StreamEvent.EntryClicked -> {
+                openingEntry = event.entry
+                customTabsController.launch(event.context, event.entry.entry.url)
             }
 
             is StreamEvent.EntryDeleted -> viewModelScope.launch {
