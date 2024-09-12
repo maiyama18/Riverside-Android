@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
@@ -37,11 +38,14 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.example.riverside.BuildConfig
+import com.example.riverside.ui.components.ContentUnavailableAction
+import com.example.riverside.ui.components.ContentUnavailableView
 import com.example.riverside.ui.components.FeedImage
 import com.example.riverside.ui.components.SwipeAction
 import com.example.riverside.ui.components.SwipeListItem
 import com.example.riverside.ui.components.WithTopBar
 import com.example.riverside.ui.navigation.FeedDetail
+import com.example.riverside.ui.navigation.FeedSubscription
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
@@ -58,7 +62,10 @@ fun StreamScreen(
     navController: NavHostController,
 ) {
     val context = LocalContext.current
-    WithTopBar(title = "Stream", navController = navController) {
+    WithTopBar(
+        title = state.unreadEntryCount?.let { "Stream ($it)" } ?: "Stream",
+        navController = navController,
+    ) {
         state.sections?.let { sections ->
             val pullToRefreshState = rememberPullToRefreshState()
             PullToRefreshBox(
@@ -66,47 +73,64 @@ fun StreamScreen(
                 isRefreshing = state.isRefreshing,
                 onRefresh = { onEvent(StreamEvent.PullToRefreshed) },
             ) {
-                // TODO: Add empty view
-                LazyColumn {
-                    sections.forEach { section ->
-                        stickyHeader {
-                            Text(
-                                text = section.date.format(LocalDate.Format { byUnicodePattern("yyyy/MM/dd") }),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surface)
-                                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold,
-                                ),
-                            )
-                            HorizontalDivider(thickness = 0.5.dp)
-                        }
-                        itemsIndexed(
-                            section.entries,
-                            key = { _, entry -> entry.entry.url },
-                        ) { index, entry ->
-                            StreamItem(
-                                entry = entry,
-                                modifier = Modifier
-                                    .animateItem(
-                                        fadeInSpec = tween(500),
-                                        placementSpec = tween(500),
-                                        fadeOutSpec = tween(500)
-                                    )
-                                    .clickable {
-                                        onEvent(StreamEvent.EntryClicked(context, entry))
-                                    },
-                                onMarkAsRead = { onEvent(StreamEvent.EntryMarkedAsRead(it)) },
-                                onMarkAsUnread = { onEvent(StreamEvent.EntryMarkedAsUnread(it)) },
-                                onDelete = { onEvent(StreamEvent.EntryDeleted(it)) },
-                                onFeedTitleTap = { navController.navigate(FeedDetail(it)) },
-                            )
-                            HorizontalDivider(
-                                modifier = Modifier.padding(bottom = if (index == section.entries.lastIndex) 16.dp else 0.dp),
-                                thickness = 0.5.dp,
-                            )
+                if (sections.isEmpty()) {
+                    if (state.isNoFeedSubscribed) {
+                        ContentUnavailableView(
+                            icon = Icons.AutoMirrored.Filled.FormatListBulleted,
+                            title = "No following feed",
+                            action = ContentUnavailableAction(
+                                title = "Add feed",
+                                action = { navController.navigate(FeedSubscription) },
+                            ),
+                        )
+                    } else {
+                        ContentUnavailableView(
+                            icon = Icons.AutoMirrored.Filled.FormatListBulleted,
+                            title = "You've read all entries",
+                        )
+                    }
+                } else {
+                    LazyColumn {
+                        sections.forEach { section ->
+                            stickyHeader {
+                                Text(
+                                    text = section.date.format(LocalDate.Format { byUnicodePattern("yyyy/MM/dd") }),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(MaterialTheme.colorScheme.surface)
+                                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold,
+                                    ),
+                                )
+                                HorizontalDivider(thickness = 0.5.dp)
+                            }
+                            itemsIndexed(
+                                section.entries,
+                                key = { _, entry -> entry.entry.url },
+                            ) { index, entry ->
+                                StreamItem(
+                                    entry = entry,
+                                    modifier = Modifier
+                                        .animateItem(
+                                            fadeInSpec = tween(500),
+                                            placementSpec = tween(500),
+                                            fadeOutSpec = tween(500)
+                                        )
+                                        .clickable {
+                                            onEvent(StreamEvent.EntryClicked(context, entry))
+                                        },
+                                    onMarkAsRead = { onEvent(StreamEvent.EntryMarkedAsRead(it)) },
+                                    onMarkAsUnread = { onEvent(StreamEvent.EntryMarkedAsUnread(it)) },
+                                    onDelete = { onEvent(StreamEvent.EntryDeleted(it)) },
+                                    onFeedTitleTap = { navController.navigate(FeedDetail(it)) },
+                                )
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(bottom = if (index == section.entries.lastIndex) 16.dp else 0.dp),
+                                    thickness = 0.5.dp,
+                                )
+                            }
                         }
                     }
                 }

@@ -34,6 +34,12 @@ data class StreamUiState(
     val feeds: List<Feed>?,
     val isRefreshing: Boolean,
 ) {
+    val isNoFeedSubscribed: Boolean
+        get() = feeds?.isEmpty() ?: false
+
+    val unreadEntryCount: Int?
+        get() = feeds?.sumOf { it.unreadEntryCount }
+
     val sections: List<StreamSection>?
         get() {
             if (feeds == null) {
