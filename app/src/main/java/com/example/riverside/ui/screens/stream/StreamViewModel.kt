@@ -3,6 +3,7 @@ package com.example.riverside.ui.screens.stream
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.riverside.data.models.EntriesFilter
 import com.example.riverside.data.models.Entry
 import com.example.riverside.data.models.Feed
 import com.example.riverside.data.repositories.FeedRepository
@@ -32,13 +33,17 @@ data class StreamSection(
 
 data class StreamUiState(
     val feeds: List<Feed>?,
+    val filter: EntriesFilter,
     val isRefreshing: Boolean,
 ) {
     val isNoFeedSubscribed: Boolean
         get() = feeds?.isEmpty() ?: false
 
-    val unreadEntryCount: Int?
-        get() = feeds?.sumOf { it.unreadEntryCount }
+    val title: String
+        get() = when (val unreadEntryCount = feeds?.sumOf { it.unreadEntryCount }) {
+            0, null -> "Stream"
+            else -> "Stream ($unreadEntryCount)"
+        }
 
     val sections: List<StreamSection>?
         get() {
@@ -71,7 +76,7 @@ class StreamViewModel @Inject constructor(
     private val customTabsController: CustomTabsController,
 ) : ViewModel() {
     private val _state: MutableStateFlow<StreamUiState> =
-        MutableStateFlow(StreamUiState(null, isRefreshing = false))
+        MutableStateFlow(StreamUiState(null, EntriesFilter.ALL, isRefreshing = false))
     val state: StateFlow<StreamUiState> = _state
 
     private var openingEntry: StreamEntry? = null

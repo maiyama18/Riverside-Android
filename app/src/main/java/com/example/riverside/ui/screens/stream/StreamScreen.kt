@@ -63,7 +63,7 @@ fun StreamScreen(
 ) {
     val context = LocalContext.current
     WithTopBar(
-        title = state.unreadEntryCount?.let { "Stream ($it)" } ?: "Stream",
+        title = state.title,
         navController = navController,
     ) {
         state.sections?.let { sections ->
