@@ -15,6 +15,8 @@ class FeedFetcher @Inject constructor(
 ) {
     private val endpointUrl = "https://rssproxy-6q4koorr7a-an.a.run.app/riverside/feeds"
 
+    suspend fun fetchFeeds(urls: List<String>, force: Boolean): FeedsResponse = request(urls, force)
+
     suspend fun fetchFeed(url: String, force: Boolean): FeedResponse {
         val response = request(listOf(url), force)
         val feedResult = response.feeds[url]

@@ -8,6 +8,7 @@ import com.example.riverside.data.models.Entry
 import com.example.riverside.data.models.Feed
 import com.example.riverside.data.network.FeedFetcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -51,14 +52,37 @@ class FeedRepository @Inject constructor(
         return feed.toModel()
     }
 
-    suspend fun updateFeed(url: String, existingFeed: Feed) {
-        val feed = feedFetcher.fetchFeed(url, true)
+    suspend fun updateAllFeeds(force: Boolean) {
+        val existingFeedEntities = feedDao.findAll().firstOrNull()
+            ?: if (force) {
+                throw IllegalStateException("No feeds to update")
+            } else {
+                return
+            }
+        val existingFeeds = existingFeedEntities.map { (feedEntity, entryEntities) ->
+            feedEntity.toModel(entryEntities)
+        }
+        val feedsResponse = feedFetcher.fetchFeeds(existingFeeds.map { it.url }, force)
+        val fetchedFeeds = feedsResponse.feeds.values.mapNotNull { it.feed?.toModel() }
+        existingFeeds.forEach {
+            val fetchedFeed = fetchedFeeds.find { fetchedFeed -> fetchedFeed.url == it.url }
+            if (fetchedFeed != null) {
+                updateExistingFeed(fetchedFeed, it)
+            }
+        }
+    }
 
-        val feedEntity = FeedEntity.fromModel(feed.toModel())
-        val newEntryEntities = feed.entries.map { EntryEntity.fromModel(it.toModel(feed.url)) }
+    suspend fun updateFeed(url: String, existingFeed: Feed) {
+        val fetchedFeed = feedFetcher.fetchFeed(url, true)
+        updateExistingFeed(fetchedFeed.toModel(), existingFeed)
+    }
+
+    private suspend fun updateExistingFeed(fetchedFeed: Feed, existingFeed: Feed) {
+        val fetchedFeedEntity = FeedEntity.fromModel(fetchedFeed)
+        val newEntryEntities = fetchedFeed.entries.map { EntryEntity.fromModel(it) }
             .filter { entry -> existingFeed.entries.none { it.url == entry.url } }
 
-        feedDao.update(feedEntity)
+        feedDao.update(fetchedFeedEntity)
         feedDao.insert(newEntryEntities)
     }
 

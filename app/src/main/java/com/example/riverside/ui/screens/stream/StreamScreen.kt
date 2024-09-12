@@ -6,10 +6,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,9 +16,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -46,7 +47,10 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
 
-@OptIn(ExperimentalFoundationApi::class, FormatStringsInDatetimeFormats::class)
+@OptIn(
+    ExperimentalFoundationApi::class, FormatStringsInDatetimeFormats::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun StreamScreen(
     state: StreamUiState,
@@ -55,11 +59,14 @@ fun StreamScreen(
 ) {
     val context = LocalContext.current
     WithTopBar(title = "Stream", navController = navController) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            state.sections?.let { sections ->
+        state.sections?.let { sections ->
+            val pullToRefreshState = rememberPullToRefreshState()
+            PullToRefreshBox(
+                state = pullToRefreshState,
+                isRefreshing = state.isRefreshing,
+                onRefresh = { onEvent(StreamEvent.PullToRefreshed) },
+            ) {
+                // TODO: Add empty view
                 LazyColumn {
                     sections.forEach { section ->
                         stickyHeader {
@@ -103,19 +110,19 @@ fun StreamScreen(
                         }
                     }
                 }
+            }
+        }
 
-                val lifecycleOwner = LocalLifecycleOwner.current
-                DisposableEffect(lifecycleOwner) {
-                    val observer = LifecycleEventObserver { _, event ->
-                        if (event == Lifecycle.Event.ON_RESUME) {
-                            onEvent(StreamEvent.Resumed)
-                        }
-                    }
-                    lifecycleOwner.lifecycle.addObserver(observer)
-                    onDispose {
-                        lifecycleOwner.lifecycle.removeObserver(observer)
-                    }
+        val lifecycleOwner = LocalLifecycleOwner.current
+        DisposableEffect(lifecycleOwner) {
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    onEvent(StreamEvent.Resumed)
                 }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
     }

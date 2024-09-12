@@ -32,6 +32,7 @@ data class StreamSection(
 
 data class StreamUiState(
     val feeds: List<Feed>?,
+    val isRefreshing: Boolean,
 ) {
     val sections: List<StreamSection>?
         get() {
@@ -51,10 +52,11 @@ data class StreamUiState(
 
 sealed class StreamEvent {
     data object Resumed : StreamEvent()
-    data class EntryMarkedAsRead(val entry: StreamEntry) : StreamEvent()
-    data class EntryMarkedAsUnread(val entry: StreamEntry) : StreamEvent()
+    data object PullToRefreshed : StreamEvent()
     data class EntryClicked(val context: Context, val entry: StreamEntry) : StreamEvent()
     data class EntryDeleted(val entry: StreamEntry) : StreamEvent()
+    data class EntryMarkedAsRead(val entry: StreamEntry) : StreamEvent()
+    data class EntryMarkedAsUnread(val entry: StreamEntry) : StreamEvent()
 }
 
 @HiltViewModel
@@ -62,7 +64,8 @@ class StreamViewModel @Inject constructor(
     private val feedRepository: FeedRepository,
     private val customTabsController: CustomTabsController,
 ) : ViewModel() {
-    private val _state: MutableStateFlow<StreamUiState> = MutableStateFlow(StreamUiState(null))
+    private val _state: MutableStateFlow<StreamUiState> =
+        MutableStateFlow(StreamUiState(null, isRefreshing = false))
     val state: StateFlow<StreamUiState> = _state
 
     private var openingEntry: StreamEntry? = null
@@ -80,6 +83,17 @@ class StreamViewModel @Inject constructor(
                 viewModelScope.launch(Dispatchers.IO) {
                     feedRepository.updateEntry(entry.entry.copy(read = true))
                     openingEntry = null
+                }
+            }
+
+            StreamEvent.PullToRefreshed -> viewModelScope.launch {
+                _state.update { it.copy(isRefreshing = true) }
+                try {
+                    feedRepository.updateAllFeeds(force = true)
+                } catch (e: Exception) {
+                    // TODO: Handle error
+                } finally {
+                    _state.update { it.copy(isRefreshing = false) }
                 }
             }
 
