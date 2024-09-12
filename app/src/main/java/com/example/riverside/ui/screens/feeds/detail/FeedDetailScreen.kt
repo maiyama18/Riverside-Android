@@ -16,13 +16,8 @@ import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -30,9 +25,6 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -44,9 +36,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.example.riverside.BuildConfig
-import com.example.riverside.data.models.EntriesFilter
 import com.example.riverside.data.models.Entry
 import com.example.riverside.ui.components.ContentUnavailableView
+import com.example.riverside.ui.components.EntriesFilter
 import com.example.riverside.ui.components.SwipeAction
 import com.example.riverside.ui.components.SwipeListItem
 import com.example.riverside.ui.components.WithTopBar
@@ -63,32 +55,10 @@ fun FeedDetailScreen(
         title = state.title,
         navController = navController,
         actions = {
-            var filterMenuExpanded by remember { mutableStateOf(false) }
-            IconButton(onClick = { filterMenuExpanded = !filterMenuExpanded }) {
-                Icon(imageVector = Icons.Default.FilterList, contentDescription = null)
-                DropdownMenu(
-                    expanded = filterMenuExpanded,
-                    onDismissRequest = { filterMenuExpanded = false },
-                ) {
-                    EntriesFilter.entries.map { filter ->
-                        DropdownMenuItem(
-                            text = { Text(filter.displayName) },
-                            trailingIcon = {
-                                if (state.filter == filter) {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = null,
-                                    )
-                                }
-                            },
-                            onClick = {
-                                onEvent(FeedDetailEvent.FilterSelected(filter))
-                                filterMenuExpanded = false
-                            },
-                        )
-                    }
-                }
-            }
+            EntriesFilter(
+                selectedFilter = state.filter,
+                onFilterSelected = { onEvent(FeedDetailEvent.FilterSelected(it)) },
+            )
         },
     ) {
         state.feed?.let { feed ->
