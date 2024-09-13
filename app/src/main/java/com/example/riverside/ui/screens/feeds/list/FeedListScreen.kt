@@ -56,7 +56,7 @@ fun FeedListScreen(
                 ContentUnavailableView(
                     icon = Icons.AutoMirrored.Filled.FormatListBulleted,
                     title = "No following feed",
-                    subtitle = "Follow your favorite feeds to see them here",
+                    subtitle = "Subscribe your favorite feeds to see them here",
                     action = ContentUnavailableAction(
                         title = "Subscribe feed",
                         action = { navController.navigate(FeedSubscription) },

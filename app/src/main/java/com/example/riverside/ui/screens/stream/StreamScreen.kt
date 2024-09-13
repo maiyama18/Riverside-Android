@@ -85,8 +85,9 @@ fun StreamScreen(
                         ContentUnavailableView(
                             icon = Icons.AutoMirrored.Filled.FormatListBulleted,
                             title = "No following feed",
+                            subtitle = "Subscribe your favorite feeds to see them here",
                             action = ContentUnavailableAction(
-                                title = "Add feed",
+                                title = "Subscribe feed",
                                 action = { navController.navigate(FeedSubscription) },
                             ),
                         )
