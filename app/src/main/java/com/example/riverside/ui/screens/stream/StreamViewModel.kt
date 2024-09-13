@@ -51,9 +51,17 @@ data class StreamUiState(
                 return null
             }
 
-            val entries = feeds.flatMap { feed ->
-                feed.entries.map { StreamEntry(it, feed.url, feed.title, feed.imageUrl) }
-            }.sortedByDescending { it.entry.publishedAt }
+            val entries = feeds
+                .flatMap { feed ->
+                    feed.entries.map { StreamEntry(it, feed.url, feed.title, feed.imageUrl) }
+                }
+                .filter { entry ->
+                    when (filter) {
+                        EntriesFilter.ALL -> true
+                        EntriesFilter.UNREAD -> !entry.entry.read
+                    }
+                }
+                .sortedByDescending { it.entry.publishedAt }
 
             return entries.groupBy { it.entry.publishedAt.toLocalDateTime(TimeZone.currentSystemDefault()).date }
                 .map { (date, entries) -> StreamSection(date, entries) }
@@ -68,6 +76,7 @@ sealed class StreamEvent {
     data class EntryDeleted(val entry: StreamEntry) : StreamEvent()
     data class EntryMarkedAsRead(val entry: StreamEntry) : StreamEvent()
     data class EntryMarkedAsUnread(val entry: StreamEntry) : StreamEvent()
+    data class FilterSelected(val filter: EntriesFilter) : StreamEvent()
 }
 
 @HiltViewModel
@@ -123,6 +132,10 @@ class StreamViewModel @Inject constructor(
 
             is StreamEvent.EntryDeleted -> viewModelScope.launch {
                 feedRepository.deleteEntry(event.entry.entry)
+            }
+
+            is StreamEvent.FilterSelected -> viewModelScope.launch {
+                _state.update { it.copy(filter = event.filter) }
             }
         }
     }

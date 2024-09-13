@@ -40,6 +40,7 @@ import androidx.navigation.NavHostController
 import com.example.riverside.BuildConfig
 import com.example.riverside.ui.components.ContentUnavailableAction
 import com.example.riverside.ui.components.ContentUnavailableView
+import com.example.riverside.ui.components.EntriesFilter
 import com.example.riverside.ui.components.FeedImage
 import com.example.riverside.ui.components.SwipeAction
 import com.example.riverside.ui.components.SwipeListItem
@@ -65,6 +66,12 @@ fun StreamScreen(
     WithTopBar(
         title = state.title,
         navController = navController,
+        actions = {
+            EntriesFilter(
+                selectedFilter = state.filter,
+                onFilterSelected = { onEvent(StreamEvent.FilterSelected(it)) },
+            )
+        }
     ) {
         state.sections?.let { sections ->
             val pullToRefreshState = rememberPullToRefreshState()
