@@ -1,6 +1,7 @@
 package com.example.riverside.ui.screens.stream
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.riverside.data.models.EntriesFilter
@@ -98,6 +99,8 @@ class StreamViewModel @Inject constructor(
     }
 
     fun onEvent(event: StreamEvent) {
+        Log.d("StreamViewModel", "onEvent: $event")
+
         when (event) {
             StreamEvent.Resumed -> openingEntry?.let { entry ->
                 viewModelScope.launch(Dispatchers.IO) {
