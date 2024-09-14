@@ -1,5 +1,6 @@
 package com.example.riverside.ui.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -9,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.riverside.ui.components.WithTopBar
 import com.example.riverside.ui.screens.feeds.detail.FeedDetailScreen
 import com.example.riverside.ui.screens.feeds.detail.FeedDetailViewModel
 import com.example.riverside.ui.screens.feeds.list.FeedListScreen
@@ -16,6 +18,7 @@ import com.example.riverside.ui.screens.feeds.subscription.FeedSubscriptionScree
 import com.example.riverside.ui.screens.settings.SettingsScreen
 import com.example.riverside.ui.screens.stream.StreamScreen
 import com.example.riverside.ui.screens.stream.StreamViewModel
+import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -32,6 +35,9 @@ object FeedSubscription
 
 @Serializable
 data class FeedDetail(val feedUrl: String)
+
+@Serializable
+object Licenses
 
 @Composable
 fun RootNavHost(
@@ -75,6 +81,11 @@ fun RootNavHost(
                 onEvent = viewModel::onEvent,
                 navController = navController
             )
+        }
+        composable<Licenses> {
+            WithTopBar(title = "Licenses", navController = navController) {
+                LibrariesContainer(modifier = Modifier.fillMaxSize())
+            }
         }
     }
 }

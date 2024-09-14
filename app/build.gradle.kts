@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.dagger.hilt.android)
     alias(libs.plugins.google.devtools.ksp)
+    alias(libs.plugins.about.libraries)
 }
 
 android {
@@ -79,6 +80,8 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.compose)
     implementation(libs.brower)
+    implementation(libs.about.libraries.core)
+    implementation(libs.about.libraries.compose.material3)
 
     ksp(libs.google.dagger.hilt.compiler)
     ksp(libs.google.dagger.hilt.android.compiler)

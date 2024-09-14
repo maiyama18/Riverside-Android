@@ -19,6 +19,7 @@ ktor = "2.3.12"
 coil = "2.7.0"
 datetime = "0.6.1"
 browser = "1.8.0"
+aboutLibraries = "11.2.3"
 ksp = "2.0.20-1.0.24"
 
 [libraries]
@@ -56,6 +57,8 @@ ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlin
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 brower = { group = "androidx.browser", name = "browser", version.ref = "browser" }
+about-libraries-core = { group = "com.mikepenz", name = "aboutlibraries-core", version.ref = "aboutLibraries" }
+about-libraries-compose-material3 = { group = "com.mikepenz", name = "aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -64,3 +67,4 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization" }
 google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
