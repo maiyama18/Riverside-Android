@@ -16,6 +16,7 @@ import com.example.riverside.ui.screens.feeds.detail.FeedDetailViewModel
 import com.example.riverside.ui.screens.feeds.list.FeedListScreen
 import com.example.riverside.ui.screens.feeds.subscription.FeedSubscriptionScreen
 import com.example.riverside.ui.screens.settings.SettingsScreen
+import com.example.riverside.ui.screens.settings.SettingsViewModel
 import com.example.riverside.ui.screens.stream.StreamScreen
 import com.example.riverside.ui.screens.stream.StreamViewModel
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
@@ -62,7 +63,11 @@ fun RootNavHost(
             FeedListScreen(navController = navController)
         }
         composable<Settings> {
-            SettingsScreen(navController = navController)
+            val viewModel: SettingsViewModel = hiltViewModel()
+            SettingsScreen(
+                formattedDatabaseSize = viewModel.formattedDatabaseSize,
+                navController = navController,
+            )
         }
 
         composable<FeedSubscription> {
