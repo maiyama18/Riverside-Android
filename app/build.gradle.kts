@@ -82,10 +82,13 @@ dependencies {
     implementation(libs.brower)
     implementation(libs.about.libraries.core)
     implementation(libs.about.libraries.compose.material3)
+    implementation(libs.work.runtime)
+    implementation(libs.androidx.hilt.work)
 
     ksp(libs.google.dagger.hilt.compiler)
     ksp(libs.google.dagger.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)
+    ksp(libs.androidx.hilt.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

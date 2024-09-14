@@ -52,24 +52,27 @@ class FeedRepository @Inject constructor(
         return feed.toModel()
     }
 
-    suspend fun updateAllFeeds(force: Boolean) {
+    suspend fun updateAllFeeds(force: Boolean): List<Entry> {
         val existingFeedEntities = feedDao.findAll().firstOrNull()
             ?: if (force) {
                 throw IllegalStateException("No feeds to update")
             } else {
-                return
+                return emptyList()
             }
         val existingFeeds = existingFeedEntities.map { (feedEntity, entryEntities) ->
             feedEntity.toModel(entryEntities)
         }
         val feedsResponse = feedFetcher.fetchFeeds(existingFeeds.map { it.url }, force)
         val fetchedFeeds = feedsResponse.feeds.values.mapNotNull { it.feed?.toModel() }
+
+        val newEntries: MutableList<Entry> = mutableListOf()
         existingFeeds.forEach {
             val fetchedFeed = fetchedFeeds.find { fetchedFeed -> fetchedFeed.url == it.url }
             if (fetchedFeed != null) {
-                updateExistingFeed(fetchedFeed, it)
+                newEntries += updateExistingFeed(fetchedFeed, it)
             }
         }
+        return newEntries
     }
 
     suspend fun updateFeed(url: String, existingFeed: Feed) {
@@ -77,13 +80,14 @@ class FeedRepository @Inject constructor(
         updateExistingFeed(fetchedFeed.toModel(), existingFeed)
     }
 
-    private suspend fun updateExistingFeed(fetchedFeed: Feed, existingFeed: Feed) {
+    private suspend fun updateExistingFeed(fetchedFeed: Feed, existingFeed: Feed): List<Entry> {
         val fetchedFeedEntity = FeedEntity.fromModel(fetchedFeed)
         val newEntryEntities = fetchedFeed.entries.map { EntryEntity.fromModel(it) }
             .filter { entry -> existingFeed.entries.none { it.url == entry.url } }
 
         feedDao.update(fetchedFeedEntity)
         feedDao.insert(newEntryEntities)
+        return newEntryEntities.map { it.toModel() }
     }
 
     fun entries(feedUrl: String): Flow<List<Entry>> =
