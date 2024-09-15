@@ -38,6 +38,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.example.riverside.BuildConfig
+import com.example.riverside.data.models.EntryWithFeedInfo
 import com.example.riverside.ui.components.ContentUnavailableAction
 import com.example.riverside.ui.components.ContentUnavailableView
 import com.example.riverside.ui.components.EntriesFilter
@@ -162,10 +163,10 @@ fun StreamScreen(
 
 @Composable
 fun StreamItem(
-    entry: StreamEntry,
-    onMarkAsRead: (StreamEntry) -> Unit,
-    onMarkAsUnread: (StreamEntry) -> Unit,
-    onDelete: (StreamEntry) -> Unit,
+    entry: EntryWithFeedInfo,
+    onMarkAsRead: (EntryWithFeedInfo) -> Unit,
+    onMarkAsUnread: (EntryWithFeedInfo) -> Unit,
+    onDelete: (EntryWithFeedInfo) -> Unit,
     onFeedTitleTap: (feedUrl: String) -> Unit,
     modifier: Modifier = Modifier
 ) {

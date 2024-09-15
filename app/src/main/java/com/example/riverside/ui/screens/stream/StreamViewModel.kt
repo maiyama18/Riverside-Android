@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.riverside.data.models.EntriesFilter
-import com.example.riverside.data.models.Entry
+import com.example.riverside.data.models.EntryWithFeedInfo
 import com.example.riverside.data.models.Feed
 import com.example.riverside.data.repositories.FeedRepository
 import com.example.riverside.ui.controllers.CustomTabsController
@@ -20,16 +20,9 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 
-data class StreamEntry(
-    val entry: Entry,
-    val feedUrl: String,
-    val feedTitle: String,
-    val feedImageUrl: String?,
-)
-
 data class StreamSection(
     val date: LocalDate,
-    val entries: List<StreamEntry>,
+    val entries: List<EntryWithFeedInfo>,
 )
 
 data class StreamUiState(
@@ -54,7 +47,7 @@ data class StreamUiState(
 
             val entries = feeds
                 .flatMap { feed ->
-                    feed.entries.map { StreamEntry(it, feed.url, feed.title, feed.imageUrl) }
+                    feed.entries.map { EntryWithFeedInfo(it, feed.url, feed.title, feed.imageUrl) }
                 }
                 .filter { entry ->
                     when (filter) {
@@ -73,10 +66,10 @@ data class StreamUiState(
 sealed class StreamEvent {
     data object Resumed : StreamEvent()
     data object PullToRefreshed : StreamEvent()
-    data class EntryClicked(val context: Context, val entry: StreamEntry) : StreamEvent()
-    data class EntryDeleted(val entry: StreamEntry) : StreamEvent()
-    data class EntryMarkedAsRead(val entry: StreamEntry) : StreamEvent()
-    data class EntryMarkedAsUnread(val entry: StreamEntry) : StreamEvent()
+    data class EntryClicked(val context: Context, val entry: EntryWithFeedInfo) : StreamEvent()
+    data class EntryDeleted(val entry: EntryWithFeedInfo) : StreamEvent()
+    data class EntryMarkedAsRead(val entry: EntryWithFeedInfo) : StreamEvent()
+    data class EntryMarkedAsUnread(val entry: EntryWithFeedInfo) : StreamEvent()
     data class FilterSelected(val filter: EntriesFilter) : StreamEvent()
 }
 
@@ -89,7 +82,7 @@ class StreamViewModel @Inject constructor(
         MutableStateFlow(StreamUiState(null, EntriesFilter.ALL, isRefreshing = false))
     val state: StateFlow<StreamUiState> = _state
 
-    private var openingEntry: StreamEntry? = null
+    private var openingEntry: EntryWithFeedInfo? = null
 
     init {
         viewModelScope.launch {

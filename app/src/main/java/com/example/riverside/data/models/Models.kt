@@ -40,3 +40,11 @@ data class Entry(
     val publishedDateString: String
         get() = publishedAt.toLocalDateTime(TimeZone.currentSystemDefault()).format(entryDateFormat)
 }
+
+data class EntryWithFeedInfo(
+    val entry: Entry,
+    val feedUrl: String,
+    val feedTitle: String,
+    val feedImageUrl: String?,
+)
+
