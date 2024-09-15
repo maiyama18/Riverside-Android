@@ -1,5 +1,8 @@
 package com.example.riverside.ui.screens.root
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -58,6 +61,14 @@ fun RootScreen(
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
+    }
+
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            Log.d("RootScreen", "Permission granted: $granted")
+        }
+    LaunchedEffect(Unit) {
+        launcher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
     }
 
     Scaffold(
