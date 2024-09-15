@@ -66,6 +66,7 @@ fun RootNavHost(
             val viewModel: SettingsViewModel = hiltViewModel()
             SettingsScreen(
                 formattedDatabaseSize = viewModel.formattedDatabaseSize,
+                onEvent = viewModel::onEvent,
                 navController = navController,
             )
         }
