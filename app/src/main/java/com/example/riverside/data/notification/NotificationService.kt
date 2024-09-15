@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
+import com.example.riverside.R
 import com.example.riverside.data.models.Entry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -31,7 +32,7 @@ class NotificationService @Inject constructor(
         if (!notificationManager.areNotificationsEnabled()) return
 
         val notification = NotificationCompat.Builder(context, NEW_ENTRIES_CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(R.drawable.notification)
             .setContentTitle("New Entries")
             .setContentText("New entries are available: ${entries.joinToString()}")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
