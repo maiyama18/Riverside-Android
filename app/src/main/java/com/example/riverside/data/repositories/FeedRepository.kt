@@ -5,6 +5,7 @@ import com.example.riverside.data.database.EntryEntity
 import com.example.riverside.data.database.FeedDao
 import com.example.riverside.data.database.FeedEntity
 import com.example.riverside.data.models.Entry
+import com.example.riverside.data.models.EntryWithFeedInfo
 import com.example.riverside.data.models.Feed
 import com.example.riverside.data.network.FeedFetcher
 import kotlinx.coroutines.flow.Flow
@@ -52,7 +53,7 @@ class FeedRepository @Inject constructor(
         return feed.toModel()
     }
 
-    suspend fun updateAllFeeds(force: Boolean): List<Entry> {
+    suspend fun updateAllFeeds(force: Boolean): List<EntryWithFeedInfo> {
         val existingFeedEntities = feedDao.findAll().firstOrNull()
             ?: if (force) {
                 throw IllegalStateException("No feeds to update")
@@ -65,11 +66,14 @@ class FeedRepository @Inject constructor(
         val feedsResponse = feedFetcher.fetchFeeds(existingFeeds.map { it.url }, force)
         val fetchedFeeds = feedsResponse.feeds.values.mapNotNull { it.feed?.toModel() }
 
-        val newEntries: MutableList<Entry> = mutableListOf()
+        val newEntries: MutableList<EntryWithFeedInfo> = mutableListOf()
         existingFeeds.forEach {
             val fetchedFeed = fetchedFeeds.find { fetchedFeed -> fetchedFeed.url == it.url }
             if (fetchedFeed != null) {
-                newEntries += updateExistingFeed(fetchedFeed, it)
+                val entries = updateExistingFeed(fetchedFeed, it)
+                newEntries += entries.map { entry ->
+                    EntryWithFeedInfo(entry, it.url, it.title, it.imageUrl)
+                }
             }
         }
         return newEntries

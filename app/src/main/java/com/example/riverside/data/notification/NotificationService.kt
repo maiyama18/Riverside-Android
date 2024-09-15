@@ -5,7 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import com.example.riverside.R
-import com.example.riverside.data.models.Entry
+import com.example.riverside.data.models.EntryWithFeedInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,14 +28,28 @@ class NotificationService @Inject constructor(
         notificationManager.createNotificationChannel(channel)
     }
 
-    fun sendNewEntriesNotification(entries: List<Entry>) {
+    fun sendNewEntriesNotification(entries: List<EntryWithFeedInfo>) {
         if (!notificationManager.areNotificationsEnabled()) return
+        if (entries.isEmpty()) return
 
         val notification = NotificationCompat.Builder(context, NEW_ENTRIES_CHANNEL_ID)
-            .setSmallIcon(R.drawable.notification)
-            .setContentTitle("New Entries")
-            .setContentText("New entries are available: ${entries.joinToString()}")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setSmallIcon(R.drawable.notification)
+            .setContentTitle("${entries.size} new entries published")
+            .setStyle(
+                NotificationCompat.InboxStyle().also {
+                    if (entries.size > 6) {
+                        entries.take(5).forEach { entry ->
+                            it.addLine("${entry.entry.title} | ${entry.feedTitle}")
+                        }
+                        it.addLine("and more...")
+                    } else {
+                        entries.take(6).forEach { entry ->
+                            it.addLine("${entry.entry.title} | ${entry.feedTitle}")
+                        }
+                    }
+                }
+            )
             .setAutoCancel(true)
             .build()
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)

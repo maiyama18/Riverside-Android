@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.riverside.data.notification.NotificationService
 import com.example.riverside.data.repositories.FeedRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -12,6 +13,7 @@ import dagger.assisted.AssistedInject
 @HiltWorker
 class BackgroundFetchWorker @AssistedInject constructor(
     private val feedRepository: FeedRepository,
+    private val notificationService: NotificationService,
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
 ) : CoroutineWorker(appContext, params) {
@@ -25,8 +27,9 @@ class BackgroundFetchWorker @AssistedInject constructor(
             val newEntries = feedRepository.updateAllFeeds(force = false)
             Log.i(
                 "BackgroundFetchWorker",
-                "successfully fetched ${newEntries.size} entries: ${newEntries.joinToString { it.title }}"
+                "successfully fetched ${newEntries.size} entries: ${newEntries.joinToString { it.entry.title }}"
             )
+            notificationService.sendNewEntriesNotification(newEntries)
             return Result.success()
         } catch (e: Exception) {
             Log.e("BackgroundFetchWorker", "failed to fetch: $e")

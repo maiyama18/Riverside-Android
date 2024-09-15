@@ -6,11 +6,9 @@ import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.riverside.data.database.DatabaseFileClient
-import com.example.riverside.data.models.Entry
 import com.example.riverside.data.notification.NotificationService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import javax.inject.Inject
 
 sealed class SettingsEvent {
@@ -46,18 +44,7 @@ class SettingsViewModel @Inject constructor(
             }
 
             SettingsEvent.DebugNotificationSent -> {
-                notificationService.sendNewEntriesNotification(
-                    listOf(
-                        Entry(
-                            url = "https://example.com",
-                            title = "Debug Notification",
-                            publishedAt = Clock.System.now(),
-                            content = null,
-                            feedUrl = "https://example.com",
-                            read = false,
-                        ),
-                    )
-                )
+                notificationService.sendNewEntriesNotification(SettingsDebugData.entries)
             }
         }
     }
