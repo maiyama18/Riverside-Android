@@ -2,8 +2,11 @@ package com.example.riverside.data.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import androidx.core.app.NotificationCompat
+import com.example.riverside.MainActivity
 import com.example.riverside.R
 import com.example.riverside.data.models.EntryWithFeedInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,22 +39,34 @@ class NotificationService @Inject constructor(
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSmallIcon(R.drawable.notification)
             .setContentTitle("${entries.size} new entries published")
-            .setStyle(
-                NotificationCompat.InboxStyle().also {
-                    if (entries.size > 6) {
-                        entries.take(5).forEach { entry ->
-                            it.addLine("${entry.entry.title} | ${entry.feedTitle}")
-                        }
-                        it.addLine("and more...")
-                    } else {
-                        entries.take(6).forEach { entry ->
-                            it.addLine("${entry.entry.title} | ${entry.feedTitle}")
-                        }
-                    }
-                }
-            )
+            .setStyle(style(entries))
+            .setContentIntent(pendingIntent())
             .setAutoCancel(true)
             .build()
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+    }
+
+    private fun pendingIntent(): PendingIntent {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        return PendingIntent.getActivity(
+            context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    private fun style(entries: List<EntryWithFeedInfo>): NotificationCompat.Style {
+        return NotificationCompat.InboxStyle().also {
+            if (entries.size > 6) {
+                entries.take(5).forEach { entry ->
+                    it.addLine("${entry.entry.title} | ${entry.feedTitle}")
+                }
+                it.addLine("and more...")
+            } else {
+                entries.take(6).forEach { entry ->
+                    it.addLine("${entry.entry.title} | ${entry.feedTitle}")
+                }
+            }
+        }
     }
 }
