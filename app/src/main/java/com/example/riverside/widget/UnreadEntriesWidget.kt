@@ -42,7 +42,14 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.FormatStringsInDatetimeFormats
+import kotlinx.datetime.format.byUnicodePattern
+import kotlinx.datetime.toLocalDateTime
 
 data class WidgetEntry(
     val url: String,
@@ -72,11 +79,13 @@ class UnreadEntriesWidget : GlanceAppWidget() {
                 .map { WidgetEntry(it.url, it.title, feed.title, it.publishedAt) }
         }?.sortedByDescending { it.publishedAt } ?: emptyList()
 
+        val now = Clock.System.now()
+
         Log.d("Widget", "provideGlance ($id): unreadEntries=${unreadEntries.size}")
 
         provideContent {
             GlanceTheme {
-                UnreadEntriesWidgetContent(context, unreadEntries)
+                UnreadEntriesWidgetContent(context, unreadEntries, now)
             }
         }
     }
@@ -86,6 +95,7 @@ class UnreadEntriesWidget : GlanceAppWidget() {
 fun UnreadEntriesWidgetContent(
     context: Context,
     unreadEntries: List<WidgetEntry>,
+    now: Instant,
 ) {
     Column(
         modifier = GlanceModifier
@@ -95,13 +105,17 @@ fun UnreadEntriesWidgetContent(
                 onClick = actionStartActivity(Intent(context, MainActivity::class.java))
             ),
     ) {
-        UnreadEntriesWidgetHeader(unreadEntries.size)
+        UnreadEntriesWidgetHeader(unreadEntries.size, now)
         UnreadEntriesWidgetEntryList(context, unreadEntries)
     }
 }
 
+@OptIn(FormatStringsInDatetimeFormats::class)
 @Composable
-fun UnreadEntriesWidgetHeader(unreadEntryCount: Int) {
+fun UnreadEntriesWidgetHeader(
+    unreadEntryCount: Int,
+    now: Instant,
+) {
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
@@ -134,6 +148,18 @@ fun UnreadEntriesWidgetHeader(unreadEntryCount: Int) {
                     )
                 )
             }
+        }
+
+        Row(modifier = GlanceModifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+            val updatedAtString = now.toLocalDateTime(TimeZone.currentSystemDefault())
+                .format(LocalDateTime.Format { byUnicodePattern("HH:mm") })
+            Text(
+                "at $updatedAtString",
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = GlanceTheme.colors.secondary,
+                ),
+            )
         }
     }
 }
@@ -244,7 +270,8 @@ fun UnreadEntriesWidgetPreview() {
                     feedTitle = "maiyama4's blog",
                     publishedAt = Instant.DISTANT_PAST,
                 ),
-            )
+            ),
+            now = Instant.DISTANT_PAST,
         )
     }
 }
@@ -254,6 +281,10 @@ fun UnreadEntriesWidgetPreview() {
 @Composable
 fun UnreadEntriesWidgetEmptyPreview() {
     GlanceTheme {
-        UnreadEntriesWidgetContent(context = LocalContext.current, unreadEntries = emptyList())
+        UnreadEntriesWidgetContent(
+            context = LocalContext.current,
+            unreadEntries = emptyList(),
+            now = Instant.DISTANT_PAST,
+        )
     }
 }
