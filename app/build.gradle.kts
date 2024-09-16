@@ -84,6 +84,8 @@ dependencies {
     implementation(libs.about.libraries.compose.material3)
     implementation(libs.work.runtime)
     implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
 
     ksp(libs.google.dagger.hilt.compiler)
     ksp(libs.google.dagger.hilt.android.compiler)

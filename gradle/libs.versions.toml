@@ -22,6 +22,7 @@ browser = "1.8.0"
 aboutLibraries = "11.2.3"
 workManager = "2.8.1"
 androidHilt = "1.2.0"
+glance = "1.1.0"
 ksp = "2.0.20-1.0.24"
 
 [libraries]
@@ -64,6 +65,8 @@ about-libraries-compose-material3 = { group = "com.mikepenz", name = "aboutlibra
 work-runtime = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
 androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidHilt" }
 androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androidHilt" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
+androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
