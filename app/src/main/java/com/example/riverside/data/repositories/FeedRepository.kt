@@ -1,5 +1,6 @@
 package com.example.riverside.data.repositories
 
+import android.content.Context
 import com.example.riverside.data.database.EntryDao
 import com.example.riverside.data.database.EntryEntity
 import com.example.riverside.data.database.FeedDao
@@ -8,6 +9,8 @@ import com.example.riverside.data.models.Entry
 import com.example.riverside.data.models.EntryWithFeedInfo
 import com.example.riverside.data.models.Feed
 import com.example.riverside.data.network.FeedFetcher
+import com.example.riverside.widget.WidgetClient
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -17,6 +20,8 @@ class FeedRepository @Inject constructor(
     private val feedDao: FeedDao,
     private val entryDao: EntryDao,
     private val feedFetcher: FeedFetcher,
+    private val widgetClient: WidgetClient,
+    @ApplicationContext private val context: Context,
 ) {
     fun feed(url: String): Flow<Feed?> =
         feedDao.find(url).map {
@@ -76,12 +81,16 @@ class FeedRepository @Inject constructor(
                 }
             }
         }
+        if (newEntries.isNotEmpty()) {
+            widgetClient.updateAllWidgets(context)
+        }
         return newEntries
     }
 
     suspend fun updateFeed(url: String, existingFeed: Feed) {
         val fetchedFeed = feedFetcher.fetchFeed(url, true)
         updateExistingFeed(fetchedFeed.toModel(), existingFeed)
+        widgetClient.updateAllWidgets(context)
     }
 
     private suspend fun updateExistingFeed(fetchedFeed: Feed, existingFeed: Feed): List<Entry> {
@@ -102,16 +111,19 @@ class FeedRepository @Inject constructor(
     suspend fun makeEntryAsRead(url: String) {
         entryDao.find(url)?.let { entryEntity ->
             entryDao.update(entryEntity.copy(read = true))
+            widgetClient.updateAllWidgets(context)
         }
     }
 
     suspend fun updateEntry(entry: Entry) {
         val entryEntity = EntryEntity.fromModel(entry)
         entryDao.update(entryEntity)
+        widgetClient.updateAllWidgets(context)
     }
 
     suspend fun deleteEntry(entry: Entry) {
         val entryEntity = EntryEntity.fromModel(entry)
         entryDao.delete(entryEntity)
+        widgetClient.updateAllWidgets(context)
     }
 }
