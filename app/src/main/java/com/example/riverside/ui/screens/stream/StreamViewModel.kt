@@ -8,6 +8,7 @@ import com.example.riverside.data.models.EntriesFilter
 import com.example.riverside.data.models.EntryWithFeedInfo
 import com.example.riverside.data.models.Feed
 import com.example.riverside.data.repositories.FeedRepository
+import com.example.riverside.data.repositories.PreferencesRepository
 import com.example.riverside.ui.controllers.CustomTabsController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +77,7 @@ sealed class StreamEvent {
 @HiltViewModel
 class StreamViewModel @Inject constructor(
     private val feedRepository: FeedRepository,
+    private val preferencesRepository: PreferencesRepository,
     private val customTabsController: CustomTabsController,
 ) : ViewModel() {
     private val _state: MutableStateFlow<StreamUiState> =
@@ -88,6 +90,11 @@ class StreamViewModel @Inject constructor(
         viewModelScope.launch {
             feedRepository.subscribedFeeds()
                 .collect { feeds -> _state.update { it.copy(feeds = feeds) } }
+        }
+        viewModelScope.launch {
+            preferencesRepository.streamEntriesFilter.collect { filter ->
+                _state.update { it.copy(filter = filter) }
+            }
         }
     }
 
@@ -132,6 +139,7 @@ class StreamViewModel @Inject constructor(
 
             is StreamEvent.FilterSelected -> viewModelScope.launch {
                 _state.update { it.copy(filter = event.filter) }
+                preferencesRepository.setStreamEntriesFilter(event.filter)
             }
         }
     }
