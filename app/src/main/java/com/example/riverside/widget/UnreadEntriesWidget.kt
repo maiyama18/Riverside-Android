@@ -1,9 +1,7 @@
 package com.example.riverside.widget
 
 import android.content.Context
-import android.graphics.drawable.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -12,8 +10,11 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.LocalContext
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
@@ -32,6 +33,7 @@ import androidx.glance.preview.Preview
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import com.example.riverside.MainActivity
 import com.example.riverside.R
 import com.example.riverside.data.repositories.FeedRepository
 import dagger.hilt.EntryPoint
@@ -71,9 +73,27 @@ class UnreadEntriesWidget : GlanceAppWidget() {
 
         provideContent {
             GlanceTheme {
-                UnreadEntriesWidgetContent(unreadEntries)
+                UnreadEntriesWidgetContent(context, unreadEntries)
             }
         }
+    }
+}
+
+@Composable
+fun UnreadEntriesWidgetContent(
+    context: Context,
+    unreadEntries: List<WidgetEntry>,
+) {
+    Column(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .background(GlanceTheme.colors.widgetBackground)
+            .clickable(
+                onClick = actionStartActivity(Intent(context, MainActivity::class.java))
+            ),
+    ) {
+        UnreadEntriesWidgetHeader(unreadEntries.size)
+        UnreadEntriesWidgetEntryList(context, unreadEntries)
     }
 }
 
@@ -116,7 +136,7 @@ fun UnreadEntriesWidgetHeader(unreadEntryCount: Int) {
 }
 
 @Composable
-fun UnreadEntriesWidgetEntryList(unreadEntries: List<WidgetEntry>) {
+fun UnreadEntriesWidgetEntryList(context: Context, unreadEntries: List<WidgetEntry>) {
     if (unreadEntries.isEmpty()) {
         Column(
             modifier = GlanceModifier.fillMaxSize(),
@@ -135,40 +155,39 @@ fun UnreadEntriesWidgetEntryList(unreadEntries: List<WidgetEntry>) {
     } else {
         LazyColumn(modifier = GlanceModifier.fillMaxWidth()) {
             items(unreadEntries) { entry ->
-                Column(modifier = GlanceModifier.padding(vertical = 4.dp, horizontal = 16.dp)) {
-                    Text(
-                        entry.feedTitle,
-                        style = TextStyle(
-                            color = GlanceTheme.colors.secondary,
-                            fontSize = 12.sp,
-                        ),
-                        maxLines = 1,
+                UnreadEntryItem(
+                    entry,
+                    modifier = GlanceModifier.fillMaxWidth().clickable(
+                        onClick = actionStartActivity(
+                            Intent(context, MainActivity::class.java)
+                                .putExtra("entry_url_to_open", entry.url)
+                        )
                     )
-                    Text(
-                        entry.title,
-                        style = TextStyle(
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                        ),
-                        maxLines = 2,
-                    )
-                }
+                )
             }
         }
     }
 }
 
 @Composable
-fun UnreadEntriesWidgetContent(
-    unreadEntries: List<WidgetEntry>,
-) {
-    Column(
-        modifier = GlanceModifier
-            .fillMaxSize()
-            .background(GlanceTheme.colors.widgetBackground),
-    ) {
-        UnreadEntriesWidgetHeader(unreadEntries.size)
-        UnreadEntriesWidgetEntryList(unreadEntries)
+fun UnreadEntryItem(entry: WidgetEntry, modifier: GlanceModifier = GlanceModifier) {
+    Column(modifier = modifier.padding(vertical = 4.dp, horizontal = 16.dp)) {
+        Text(
+            entry.feedTitle,
+            style = TextStyle(
+                color = GlanceTheme.colors.secondary,
+                fontSize = 12.sp,
+            ),
+            maxLines = 1,
+        )
+        Text(
+            entry.title,
+            style = TextStyle(
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+            ),
+            maxLines = 2,
+        )
     }
 }
 
@@ -178,6 +197,7 @@ fun UnreadEntriesWidgetContent(
 fun UnreadEntriesWidgetPreview() {
     GlanceTheme {
         UnreadEntriesWidgetContent(
+            context = LocalContext.current,
             unreadEntries = listOf(
                 WidgetEntry(
                     url = "https://example.com/blog/n",
@@ -231,6 +251,6 @@ fun UnreadEntriesWidgetPreview() {
 @Composable
 fun UnreadEntriesWidgetEmptyPreview() {
     GlanceTheme {
-        UnreadEntriesWidgetContent(unreadEntries = emptyList())
+        UnreadEntriesWidgetContent(context = LocalContext.current, unreadEntries = emptyList())
     }
 }

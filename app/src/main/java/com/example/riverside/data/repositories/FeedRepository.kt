@@ -99,6 +99,12 @@ class FeedRepository @Inject constructor(
             entities.map { it.toModel() }
         }
 
+    suspend fun makeEntryAsRead(url: String) {
+        entryDao.find(url)?.let { entryEntity ->
+            entryDao.update(entryEntity.copy(read = true))
+        }
+    }
+
     suspend fun updateEntry(entry: Entry) {
         val entryEntity = EntryEntity.fromModel(entry)
         entryDao.update(entryEntity)

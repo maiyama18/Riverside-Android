@@ -11,6 +11,9 @@ interface EntryDao {
     @Query("SELECT * FROM entries  WHERE feedUrl = :feedUrl")
     fun findAll(feedUrl: String): Flow<List<EntryEntity>>
 
+    @Query("SELECT * FROM entries WHERE url = :url")
+    suspend fun find(url: String): EntryEntity?
+
     @Update
     suspend fun update(entryEntity: EntryEntity)
 
