@@ -86,6 +86,8 @@ dependencies {
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
+    implementation(libs.androidx.glance.preview)
+    implementation(libs.androidx.glance.appwidget.preview)
 
     ksp(libs.google.dagger.hilt.compiler)
     ksp(libs.google.dagger.hilt.android.compiler)
