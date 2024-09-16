@@ -73,6 +73,8 @@ class FeedDetailViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             feedRepository.feed(feedUrl).collect { feed -> _state.update { it.copy(feed = feed) } }
+        }
+        viewModelScope.launch {
             preferencesRepository.feedDetailEntriesFilter.collect { filter ->
                 _state.update { it.copy(filter = filter) }
             }
