@@ -25,8 +25,11 @@ class MainApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
 
-        val workRequest =
-            PeriodicWorkRequestBuilder<BackgroundFetchWorker>(5, TimeUnit.MINUTES).build()
+        val workRequest = PeriodicWorkRequestBuilder<BackgroundFetchWorker>(
+            if (BuildConfig.DEBUG) 5 else 60,
+            TimeUnit.MINUTES
+        ).build()
+
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             BackgroundFetchWorker.NAME,
             ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
