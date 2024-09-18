@@ -9,6 +9,7 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,11 +29,13 @@ fun SwipeListItem(
     endAction: SwipeAction? = null,
     content: @Composable () -> Unit,
 ) {
+    val updatedStartAction = rememberUpdatedState(startAction)
+    val updatedEndAction = rememberUpdatedState(endAction)
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
         confirmValueChange = {
             when (it) {
-                SwipeToDismissBoxValue.StartToEnd -> startAction?.action?.invoke()
-                SwipeToDismissBoxValue.EndToStart -> endAction?.action?.invoke()
+                SwipeToDismissBoxValue.StartToEnd -> updatedStartAction.value?.action?.invoke()
+                SwipeToDismissBoxValue.EndToStart -> updatedEndAction.value?.action?.invoke()
                 SwipeToDismissBoxValue.Settled -> {}
             }
             return@rememberSwipeToDismissBoxState it == SwipeToDismissBoxValue.StartToEnd
