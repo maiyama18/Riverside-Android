@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Riverside</string>
+    <string name="unread_entries_widget_name">Unread Entries</string>
 </resources>

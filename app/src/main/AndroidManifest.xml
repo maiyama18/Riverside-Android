@@ -42,6 +42,7 @@
             tools:node="remove" />
         <receiver
             android:name=".widget.UnreadEntriesWidgetReceiver"
+            android:label="@string/unread_entries_widget_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
