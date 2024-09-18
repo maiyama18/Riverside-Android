@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.riverside"
+    namespace = "com.muijp.riverside"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.riverside"
+        applicationId = "com.muijp.riverside"
         minSdk = 33
         targetSdk = 34
         versionCode = 1
