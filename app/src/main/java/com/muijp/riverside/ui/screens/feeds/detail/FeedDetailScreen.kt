@@ -128,6 +128,7 @@ fun EntryListItem(
     modifier: Modifier = Modifier
 ) {
     SwipeListItem(
+        modifier = modifier,
         startAction = if (BuildConfig.DEBUG) SwipeAction(
             icon = Icons.Default.Delete,
             background = MaterialTheme.colorScheme.error,
@@ -144,7 +145,7 @@ fun EntryListItem(
         ),
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 16.dp, vertical = 8.dp),
